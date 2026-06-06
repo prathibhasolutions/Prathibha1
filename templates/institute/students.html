@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}Our Students | Prathibha Institute{% endblock %}
+
+{% block content %}
+<section class="section-intro" id="students-overview">
+    <h2>Our Students</h2>
+    <p>Grouped achievers shown inside one shared panel per exam type.</p>
+</section>
+
+<section class="institute-catalog student-group-section">
+    <div class="institute-catalog-head">
+        <h3>EAPCET</h3>
+    </div>
+    <div class="student-group-panel">
+        <div class="student-photo-grid">
+            {% for item in grouped_students.eapcet %}
+            <div class="student-photo-item student-photo-item--stacked">
+                {% if item.image %}
+                <img src="{{ item.image.url }}" alt="{{ item.student_name }}" class="student-photo-avatar">
+                {% elif item.image_url %}
+                <img src="{{ item.image_url }}" alt="{{ item.student_name }}" class="student-photo-avatar">
+                {% else %}
+                <div class="student-photo-avatar student-photo-placeholder">{{ item.student_name|slice:':1' }}</div>
+                {% endif %}
+                <div class="student-photo-meta">
+                    <strong>{{ item.student_name }}</strong>
+                    {% if item.htno %}<span>HTNO: {{ item.htno }}</span>{% endif %}
+                    {% if item.rank_label %}<span>Rank: {{ item.rank_label }}</span>{% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <p class="warning-note">No EAPCET topper records added yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="institute-catalog student-group-section">
+    <div class="institute-catalog-head">
+        <h3>Mains</h3>
+    </div>
+    <div class="student-group-panel">
+        <div class="student-photo-grid">
+            {% for item in grouped_students.jee_mains %}
+            <div class="student-photo-item student-photo-item--stacked">
+                {% if item.image %}
+                <img src="{{ item.image.url }}" alt="{{ item.student_name }}" class="student-photo-avatar">
+                {% elif item.image_url %}
+                <img src="{{ item.image_url }}" alt="{{ item.student_name }}" class="student-photo-avatar">
+                {% else %}
+                <div class="student-photo-avatar student-photo-placeholder">{{ item.student_name|slice:':1' }}</div>
+                {% endif %}
+                <div class="student-photo-meta">
+                    <strong>{{ item.student_name }}</strong>
+                    {% if item.htno %}<span>HTNO: {{ item.htno }}</span>{% endif %}
+                    {% if item.rank_label %}<span>Rank: {{ item.rank_label }}</span>{% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <p class="warning-note">No JEE Mains topper records added yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="institute-catalog student-group-section">
+    <div class="institute-catalog-head">
+        <h3>Placed Students</h3>
+    </div>
+    <div class="student-group-panel">
+        <div class="student-photo-grid">
+            {% for item in grouped_students.placement %}
+            <div class="student-photo-item student-photo-item--stacked">
+                {% if item.image %}
+                <img src="{{ item.image.url }}" alt="{{ item.student_name }}" class="student-photo-avatar">
+                {% elif item.image_url %}
+                <img src="{{ item.image_url }}" alt="{{ item.student_name }}" class="student-photo-avatar">
+                {% else %}
+                <div class="student-photo-avatar student-photo-placeholder">{{ item.student_name|slice:':1' }}</div>
+                {% endif %}
+                <div class="student-photo-meta">
+                    <strong>{{ item.student_name }}</strong>
+                    {% if item.htno %}<span>HTNO: {{ item.htno }}</span>{% endif %}
+                    {% if item.company_name %}<span>Company: {{ item.company_name }}</span>{% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <p class="warning-note">No placement records added yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Online Mock Tests
+{% endblock %}
+
+{% block content %}
+
+<section class="exam-page">
+
+    <div class="exam-header">
+        <h1>Online Mock Test Portal</h1>
+
+        <p>
+            Practice with real exam-style tests and improve
+            your speed, accuracy, confidence and performance.
+        </p>
+    </div>
+
+    <div class="exam-grid">
+
+        {% for exam in exam_categories %}
+
+        <div class="exam-card">
+
+            <h3>{{ exam.title }}</h3>
+
+            <p>{{ exam.description }}</p>
+
+            {% if exam.id %}
+            <a href="{% url 'institute:exam_detail' exam.id %}" class="exam-btn">Take Test</a>
+            {% else %}
+            <span class="exam-btn">Take Test</span>
+            {% endif %}
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    <div class="why-tests">
+
+        <h2>
+            Why Should You Take Online Mock Tests?
+        </h2>
+
+        <ul>
+            <li>✅ Helps in understanding exam pattern and time management</li>
+            <li>✅ Identifies strengths and weaknesses</li>
+            <li>✅ Boosts confidence with real exam simulation</li>
+            <li>✅ Provides instant feedback and analysis</li>
+            <li>✅ Improves speed, accuracy and performance</li>
+        </ul>
+
+    </div>
+
+</section>
+
+{% endblock %}

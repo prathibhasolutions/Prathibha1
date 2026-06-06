@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Prathibha Technologies{% endblock %}
+
+{% block content %}
+<section class="section-intro">
+    <h2>Prathibha Technologies</h2>
+    <p>Specialized support in laptop and device services. Login and book any technology service to your location.</p>
+</section>
+
+{% if user.is_authenticated %}
+<p class="section-contact">Welcome {{ user.username }}. Track your requests in <a href="{% url 'technologies:my_bookings' %}">My Bookings</a>.</p>
+{% else %}
+<p class="section-contact">Please <a href="{% url 'login' %}">login</a> to book a technology service instantly.</p>
+{% endif %}
+
+<div class="cards technologies-grid">
+    <article class="card card-service"><div class="card-heading-row">{% include 'partials/icon.html' with icon_id='peripherals' %}<h3>Peripherals and Sales</h3></div><p>Accessories, upgrades, and device purchases with guidance.</p><a class="card-link" href="{% url 'technologies:book' %}?service=Peripherals+and+Sales">Book Now</a></article>
+    <article class="card card-service"><div class="card-heading-row">{% include 'partials/icon.html' with icon_id='hardware' %}<h3>Hardware Services</h3></div><p>Laptop and desktop hardware diagnostics and replacement.</p><a class="card-link" href="{% url 'technologies:book' %}?service=Hardware+Services">Book Now</a></article>
+    <article class="card card-service"><div class="card-heading-row">{% include 'partials/icon.html' with icon_id='printer' %}<h3>Printer Services</h3></div><p>Printer setup, maintenance, and onsite troubleshooting.</p><a class="card-link" href="{% url 'technologies:book' %}?service=Printer+Services">Book Now</a></article>
+    <article class="card card-service"><div class="card-heading-row">{% include 'partials/icon.html' with icon_id='cartridge' %}<h3>Cartridge Refilling</h3></div><p>Cost-effective refilling and quality print optimization.</p><a class="card-link" href="{% url 'technologies:book' %}?service=Cartridge+Refilling">Book Now</a></article>
+    <article class="card card-service"><div class="card-heading-row">{% include 'partials/icon.html' with icon_id='chip-level' %}<h3>Chip Level Services</h3></div><p>Advanced motherboard and component-level repairs.</p><a class="card-link" href="{% url 'technologies:book' %}?service=Chip+Level+Services">Book Now</a></article>
+    <article class="card card-service"><div class="card-heading-row">{% include 'partials/icon.html' with icon_id='networking' %}<h3>Networking</h3></div><p>Router setup, LAN wiring, and network stability support.</p><a class="card-link" href="{% url 'technologies:book' %}?service=Networking">Book Now</a></article>
+    <article class="card card-service"><div class="card-heading-row">{% include 'partials/icon.html' with icon_id='amc-services' %}<h3>AMC Services</h3></div><p>Annual maintenance plans for offices and institutions.</p><a class="card-link" href="{% url 'technologies:book' %}?service=AMC+Services">Book Now</a></article>
+    <article class="card card-service"><div class="card-heading-row">{% include 'partials/icon.html' with icon_id='camera-services' %}<h3>CC Camera Services</h3></div><p>CCTV installation, monitoring setup, and repair.</p><a class="card-link" href="{% url 'technologies:book' %}?service=CC+Camera+Services">Book Now</a></article>
+    <article class="card card-service"><div class="card-heading-row">{% include 'partials/icon.html' with icon_id='data-recovery' %}<h3>Data Recovery</h3></div><p>Secure file recovery from disks and storage devices.</p><a class="card-link" href="{% url 'technologies:book' %}?service=Data+Recovery">Book Now</a></article>
+</div>
+
+<p class="section-contact">Phone: <strong>+91 85198 26616</strong>, <strong>99531 73670</strong></p>
+{% endblock %}

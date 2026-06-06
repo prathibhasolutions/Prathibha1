@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}My Technology Bookings{% endblock %}
+
+{% block content %}
+<section class="section-intro">
+    <h2>My Technology Bookings</h2>
+    <p>View your booked technology services, payment method, and status.</p>
+</section>
+
+{% if bookings %}
+<div class="cards technologies-grid">
+    {% for booking in bookings %}
+    <article class="card card-service">
+        <h3>{{ booking.service_name }}</h3>
+        <p><strong>Status:</strong> <span class="status-pill status-{{ booking.status }}">{{ booking.get_status_display }}</span></p>
+        <p><strong>Payment:</strong> {{ booking.get_payment_method_display }}</p>
+        <p><strong>Payment Status:</strong> <span class="status-pill payment-{{ booking.payment_status }}">{{ booking.get_payment_status_display }}</span></p>
+        <p><strong>Amount:</strong> INR {{ booking.amount_inr }}</p>
+        <p><strong>Location:</strong> {{ booking.address_line }}, {{ booking.city }} - {{ booking.pincode }}</p>
+        <p><strong>Schedule:</strong> {{ booking.preferred_date }} at {{ booking.preferred_time }}</p>
+        <p><strong>Booked On:</strong> {{ booking.created_at|date:"d M Y, h:i A" }}</p>
+
+        <div class="booking-actions">
+            {% if booking.payment_method == 'online' and booking.payment_status != 'paid' and booking.status != 'cancelled' and online_payment_enabled %}
+            <a class="card-link" href="{% url 'technologies:retry_payment' booking.id %}">Retry Payment</a>
+            {% endif %}
+
+            {% if booking.status != 'cancelled' and booking.status != 'completed' %}
+            <a class="card-link" href="{% url 'technologies:reschedule_booking' booking.id %}">Reschedule</a>
+            <form method="post" action="{% url 'technologies:cancel_booking' booking.id %}" class="inline-form">
+                {% csrf_token %}
+                <button type="submit" class="link-button danger-link">Cancel Booking</button>
+            </form>
+            {% endif %}
+        </div>
+    </article>
+    {% endfor %}
+</div>
+{% else %}
+<p class="section-contact">You have no technology bookings yet. <a href="{% url 'technologies:home' %}">Book now</a>.</p>
+{% endif %}
+{% endblock %}

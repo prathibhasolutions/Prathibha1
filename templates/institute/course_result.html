@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ course.title }} Result | Prathibha Institute{% endblock %}
+
+{% block content %}
+<section class="solutions-hero institute-hero">
+    <p class="solutions-label">Prathibha Institute</p>
+    <h2>{{ course.title }} - Mock {{ mock_number }} Result</h2>
+    <p>Your score: <strong>{{ score }}/{{ total }}</strong> ({{ percent }}%)</p>
+    <p>Mode: {{ difficulty_label }}{% if topic_name %} | Topic: {{ topic_name }}{% endif %}</p>
+</section>
+
+<section class="solutions-detail-card institute-result-card">
+    <h3>Question-wise Review</h3>
+    <div class="institute-review-list">
+        {% for item in results %}
+        <article class="institute-review-item {% if item.is_correct %}institute-correct{% else %}institute-wrong{% endif %}">
+            <h4>Q{{ forloop.counter }}. {{ item.question }}</h4>
+            <p><strong>Your Answer:</strong>
+                {% if item.selected_text %}
+                    {{ item.selected_text }}
+                {% else %}
+                    Not attempted
+                {% endif %}
+            </p>
+            <p><strong>Correct Answer:</strong> {{ item.correct_text }}</p>
+            {% if not item.is_correct %}
+            <p><strong>Explanation:</strong> {{ item.explanation }}</p>
+            {% endif %}
+        </article>
+        {% endfor %}
+    </div>
+    <p>
+        <a class="auth-btn" href="{% url 'institute:course_test' course.slug %}?mock={{ mock_number }}&difficulty={{ difficulty }}{% if topic_slug %}&topic={{ topic_slug }}{% endif %}">Retake Mock {{ mock_number }}</a>
+        <a class="auth-btn auth-btn-google" href="{% url 'institute:course_detail' course.slug %}">Back To Course</a>
+    </p>
+</section>
+{% endblock %}

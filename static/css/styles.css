@@ -1,0 +1,55 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f7f8fa;
+    color: #333;
+}
+.brand-color { color: #123A7A; }
+.site-header .container {
+    width: min(1100px, 92%);
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+.site-header nav a {
+    color: white;
+    margin-left: 18px;
+    text-decoration: none;
+}
+.site-header nav a:hover {
+    text-decoration: underline;
+}
+.container {
+    width: min(1100px, 92%);
+    margin: 32px auto;
+}
+.cards {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+.card {
+    display: block;
+    padding: 22px;
+    border-radius: 16px;
+    background: white;
+    border: 1px solid #d7dae2;
+    color: #1f3a72;
+    text-decoration: none;
+    box-shadow: 0 8px 24px rgba(31, 58, 114, 0.08);
+}
+.card:hover {
+    transform: translateY(-2px);
+    transition: transform 0.2s ease;
+}
+.site-footer {
+    background: #0f274d;
+    color: #d8e3f5;
+    padding: 16px 0;
+}
+.site-footer .container {
+    display: flex;
+    justify-content: center;
+}

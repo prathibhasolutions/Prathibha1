@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}Reschedule Technology Booking{% endblock %}
+
+{% block content %}
+<section class="section-intro">
+    <h2>Reschedule Technology Booking</h2>
+    <p>Update the preferred date and time for your technology service request.</p>
+</section>
+
+<section class="auth-panel booking-panel">
+    <h3>{{ booking.service_name }}</h3>
+    <form method="post" class="auth-form booking-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="auth-submit">Save Changes</button>
+    </form>
+</section>
+{% endblock %}

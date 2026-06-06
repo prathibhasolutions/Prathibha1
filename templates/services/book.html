@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}Book Service{% endblock %}
+
+{% block content %}
+<section class="section-intro">
+    <h2>Book a Service</h2>
+    <p>Fill your details below to schedule a service visit at your location.</p>
+</section>
+
+<section class="auth-panel booking-panel">
+    <form method="post" class="auth-form booking-form">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div class="form-errors">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <p>{{ form.service_name.label_tag }}{{ form.service_name }}{{ form.service_name.errors }}</p>
+        <p>{{ form.customer_name.label_tag }}{{ form.customer_name }}{{ form.customer_name.errors }}</p>
+        <p>{{ form.phone_number.label_tag }}{{ form.phone_number }}{{ form.phone_number.errors }}</p>
+        {{ form.customer_latitude }}
+        {{ form.customer_longitude }}
+
+        <div class="address-row">
+            <div class="address-input-wrap">
+                {{ form.address_line.label_tag }}
+                {{ form.address_line }}
+                {{ form.address_line.errors }}
+            </div>
+            <button type="button" id="use-current-location" class="auth-submit location-btn">Use Current Location</button>
+        </div>
+
+        <p>{{ form.preferred_date.label_tag }}{{ form.preferred_date }}{{ form.preferred_date.errors }}</p>
+        <p>{{ form.preferred_time.label_tag }}{{ form.preferred_time }}{{ form.preferred_time.errors }}</p>
+        <p>{{ form.notes.label_tag }}{{ form.notes }}{{ form.notes.errors }}</p>
+
+        <button type="submit" class="auth-submit">Confirm Booking</button>
+    </form>
+</section>
+
+<script>
+    document.getElementById('use-current-location').addEventListener('click', function () {
+        const addressInput = document.getElementById('id_address_line');
+        const latInput = document.getElementById('id_customer_latitude');
+        const lngInput = document.getElementById('id_customer_longitude');
+        if (!navigator.geolocation) {
+            alert('Geolocation is not supported in this browser.');
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            function (position) {
+                const lat = position.coords.latitude.toFixed(6);
+                const lng = position.coords.longitude.toFixed(6);
+                const mapUrl = 'https://maps.google.com/?q=' + lat + ',' + lng;
+                addressInput.value = mapUrl;
+                if (latInput && lngInput) {
+                    latInput.value = lat;
+                    lngInput.value = lng;
+                }
+            },
+            function () {
+                alert('Unable to fetch current location. Please allow location access.');
+            }
+        );
+    });
+</script>
+{% endblock %}

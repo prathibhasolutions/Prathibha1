@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Book Technology Service{% endblock %}
+
+{% block content %}
+<section class="section-intro">
+    <h2>Book Technology Service</h2>
+    <p>Fill your details below to schedule a technology service visit at your location.</p>
+</section>
+
+<section class="auth-panel booking-panel">
+    <form method="post" class="auth-form booking-form">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div class="form-errors">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <p>{{ form.service_name.label_tag }}{{ form.service_name }}{{ form.service_name.errors }}</p>
+        <p>{{ form.customer_name.label_tag }}{{ form.customer_name }}{{ form.customer_name.errors }}</p>
+        <p>{{ form.phone_number.label_tag }}{{ form.phone_number }}{{ form.phone_number.errors }}</p>
+
+        <p>{{ form.preferred_date.label_tag }}{{ form.preferred_date }}{{ form.preferred_date.errors }}</p>
+        <p>{{ form.preferred_time.label_tag }}{{ form.preferred_time }}{{ form.preferred_time.errors }}</p>
+        <p>{{ form.notes.label_tag }}{{ form.notes }}{{ form.notes.errors }}</p>
+
+        <button type="submit" class="auth-submit">Confirm Booking</button>
+    </form>
+</section>
+{% endblock %}

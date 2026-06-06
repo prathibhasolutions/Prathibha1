@@ -1,0 +1,467 @@
+{% extends 'base.html' %}
+
+{% block body_class %}theme-home exam-mode{% endblock %}
+
+{% block title %}{{ mock.title }} | {{ section.title }}{% endblock %}
+
+{% block content %}
+<section class="exam-page exam-attempt-page">
+    <button type="button" class="exam-mobile-toggle" id="exam-mobile-toggle" aria-expanded="true">Hide Exam Info</button>
+
+    <div class="exam-top-panel" id="exam-top-panel">
+        <div id="exam-security-gate" class="institute-security-gate">
+            <h3>Secure Exam Mode</h3>
+            <p>Enable fullscreen and camera monitoring to start the test.</p>
+            <button type="button" class="auth-btn" id="enable-secure-exam-btn">Enable and Start</button>
+        </div>
+
+        <div class="exam-header exam-attempt-header">
+            <h1>{{ mock.title }}</h1>
+            <div class="institute-timer-wrap">
+                <span>Time Left:</span>
+                <span id="exam-timer" data-timer-seconds="{{ timer_seconds }}"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="exam-layout">
+        <form method="post" class="exam-main-form" id="mock-test-form">
+            {% csrf_token %}
+            <input type="hidden" name="warning_count" id="warning-count" value="0">
+            <input type="hidden" name="auto_submit_reason" id="auto-submit-reason" value="">
+            <input type="hidden" name="reviewed_questions" id="reviewed-questions" value="">
+
+            <div class="exam-question-rail">
+                {% for question in questions %}
+                <article class="question-card exam-question-panel" data-question-id="{{ question.id }}" data-question-index="{{ forloop.counter0 }}" hidden>
+                    <h3 class="question-title exam-question-tex">{{ question.question_text|safe }}</h3>
+                    {% if question.diagram_image %}
+                    <img src="{{ question.diagram_image.url }}" alt="Question diagram" class="exam-question-diagram">
+                    {% elif question.diagram_image_url %}
+                    <img src="{{ question.diagram_image_url }}" alt="Question diagram" class="exam-question-diagram">
+                    {% endif %}
+
+                    <label class="option-item exam-option-tex">
+                        <input type="radio" name="q{{ question.id }}" value="A">
+                        <span>{{ question.option_a|safe }}</span>
+                    </label>
+                    <label class="option-item exam-option-tex">
+                        <input type="radio" name="q{{ question.id }}" value="B">
+                        <span>{{ question.option_b|safe }}</span>
+                    </label>
+                    <label class="option-item exam-option-tex">
+                        <input type="radio" name="q{{ question.id }}" value="C">
+                        <span>{{ question.option_c|safe }}</span>
+                    </label>
+                    <label class="option-item exam-option-tex">
+                        <input type="radio" name="q{{ question.id }}" value="D">
+                        <span>{{ question.option_d|safe }}</span>
+                    </label>
+                </article>
+                {% empty %}
+                <article class="question-card exam-question-panel" data-question-id="0">
+                    <h3 class="question-title">No active questions added for this mock yet.</h3>
+                    <p>Please ask admin to add questions in the Exam Mock section.</p>
+                </article>
+                {% endfor %}
+            </div>
+
+            {% if questions %}
+            <div class="exam-controls">
+                <button type="button" class="auth-btn exam-nav-btn" id="exam-prev-btn">Back Question</button>
+                <button type="button" class="auth-btn exam-nav-btn" id="exam-review-next-btn">Review & Next</button>
+                <button type="button" class="auth-btn exam-nav-btn" id="exam-next-btn">Next Question</button>
+                <button type="submit" class="exam-submit-btn exam-nav-btn" id="exam-submit-btn">Submit Test</button>
+            </div>
+            {% endif %}
+        </form>
+
+        {% if questions %}
+        <aside class="exam-sidebar" aria-label="Question navigator">
+            <div class="exam-sidebar-head">
+                <h3>Questions</h3>
+                <p>Click any number to jump to that question.</p>
+            </div>
+            <div class="exam-number-grid" id="exam-number-grid">
+                {% for question in questions %}
+                <button type="button" class="exam-number-btn" data-target-question="{{ question.id }}">{{ forloop.counter }}</button>
+                {% endfor %}
+            </div>
+            <div class="exam-legend">
+                <span><i class="exam-legend-swatch current"></i>Current</span>
+                <span><i class="exam-legend-swatch answered"></i>Answered</span>
+                <span><i class="exam-legend-swatch review"></i>Marked</span>
+            </div>
+        </aside>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+window.MathJax = {
+    loader: {
+        load: ['[tex]/mhchem']
+    },
+    tex: {
+        packages: {'[+]': ['mhchem']}
+    },
+    options: {
+        renderActions: {
+            addMenu: []
+        }
+    }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<script>
+(function () {
+    function normalizeChemMarkup(root) {
+        if (!root) {
+            return;
+        }
+
+        const raw = root.innerHTML;
+        if (!raw) {
+            return;
+        }
+
+        const wrapped = raw.replace(/(^|[^$\\])((?:\\ce|\\pu)\{[^{}]*\})/g, function (_, prefix, expr) {
+            return prefix + '\\(' + expr + '\\)';
+        });
+
+        if (wrapped !== raw) {
+            root.innerHTML = wrapped;
+        }
+    }
+
+    function typesetExamContent() {
+        document.querySelectorAll('.exam-question-tex, .exam-option-tex').forEach(normalizeChemMarkup);
+        if (window.MathJax && window.MathJax.typesetPromise) {
+            window.MathJax.typesetPromise(document.querySelectorAll('.exam-question-tex, .exam-option-tex')).catch(function () {});
+        }
+    }
+
+    if (document.readyState === 'complete') {
+        typesetExamContent();
+    } else {
+        window.addEventListener('load', typesetExamContent, { once: true });
+    }
+})();
+
+(function () {
+    const timerNode = document.getElementById('exam-timer');
+    const form = document.getElementById('mock-test-form');
+    const securityGate = document.getElementById('exam-security-gate');
+    const secureButton = document.getElementById('enable-secure-exam-btn');
+    const topPanel = document.getElementById('exam-top-panel');
+    const mobileToggle = document.getElementById('exam-mobile-toggle');
+    const warningCountInput = document.getElementById('warning-count');
+    const autoSubmitReasonInput = document.getElementById('auto-submit-reason');
+    const reviewedQuestionsInput = document.getElementById('reviewed-questions');
+    const questionPanels = Array.from(document.querySelectorAll('.exam-question-panel'));
+    const sidebarButtons = Array.from(document.querySelectorAll('.exam-number-btn'));
+    const prevBtn = document.getElementById('exam-prev-btn');
+    const nextBtn = document.getElementById('exam-next-btn');
+    const reviewNextBtn = document.getElementById('exam-review-next-btn');
+    const submitBtn = document.getElementById('exam-submit-btn');
+
+    if (!timerNode || !form || !questionPanels.length) {
+        return;
+    }
+
+    let remaining = parseInt(timerNode.getAttribute('data-timer-seconds') || '0', 10);
+    let warningCount = 0;
+    let submitted = false;
+    let secureModeActive = false;
+    let cameraStream = null;
+    let currentIndex = 0;
+    let isSubmittingIntent = false;
+    const reviewedQuestionIds = new Set();
+
+    form.style.pointerEvents = 'none';
+    form.style.opacity = '0.5';
+
+    function getAnswerForQuestion(questionId) {
+        const selected = form.querySelector('input[name="q' + questionId + '"]:checked');
+        return selected ? selected.value : '';
+    }
+
+    function refreshQuestionState() {
+        questionPanels.forEach(function (panel, index) {
+            const isActive = index === currentIndex;
+            panel.hidden = !isActive;
+            if (isActive) {
+                panel.classList.add('is-active');
+            } else {
+                panel.classList.remove('is-active');
+            }
+        });
+
+        sidebarButtons.forEach(function (button, index) {
+            const questionId = button.getAttribute('data-target-question');
+            const answered = !!getAnswerForQuestion(questionId);
+            const reviewed = reviewedQuestionIds.has(questionId);
+            button.classList.toggle('is-current', index === currentIndex);
+            button.classList.toggle('is-answered', answered);
+            button.classList.toggle('is-review', reviewed);
+        });
+
+        if (prevBtn) {
+            prevBtn.disabled = currentIndex === 0;
+        }
+        if (nextBtn) {
+            nextBtn.textContent = currentIndex === questionPanels.length - 1 ? 'Last Question' : 'Next Question';
+        }
+        if (reviewNextBtn) {
+            reviewNextBtn.textContent = currentIndex === questionPanels.length - 1 ? 'Mark & Submit' : 'Review & Next';
+        }
+        if (submitBtn) {
+            submitBtn.hidden = currentIndex !== questionPanels.length - 1;
+        }
+
+        if (window.MathJax && window.MathJax.typesetPromise) {
+            window.MathJax.typesetPromise([questionPanels[currentIndex]]).catch(function () {});
+        }
+    }
+
+    function goToQuestion(index) {
+        if (index < 0 || index >= questionPanels.length) {
+            return;
+        }
+        currentIndex = index;
+        refreshQuestionState();
+    }
+
+    function submitExam(reason) {
+        if (submitted) {
+            return;
+        }
+        isSubmittingIntent = true;
+        secureModeActive = false;
+        submitted = true;
+        if (autoSubmitReasonInput) {
+            autoSubmitReasonInput.value = reason || '';
+        }
+        if (warningCountInput) {
+            warningCountInput.value = String(warningCount);
+        }
+        if (reviewedQuestionsInput) {
+            reviewedQuestionsInput.value = Array.from(reviewedQuestionIds).join(',');
+        }
+        form.submit();
+    }
+
+    function registerViolation(reason) {
+        if (submitted || isSubmittingIntent || !secureModeActive) {
+            return;
+        }
+        warningCount += 1;
+        if (warningCountInput) {
+            warningCountInput.value = String(warningCount);
+        }
+
+        if (warningCount === 1) {
+            alert('Warning: Do not leave this exam screen. Next violation auto-submits your test.');
+            return;
+        }
+
+        alert('Test auto-submitted due to exam-rule violation. Cheating is not allowed.');
+        submitExam(reason || 'focus_violation');
+    }
+
+    async function enableSecureMode() {
+        if (!secureButton) {
+            return;
+        }
+
+        try {
+            if (document.documentElement.requestFullscreen) {
+                await document.documentElement.requestFullscreen();
+            }
+        } catch (error) {
+            registerViolation('fullscreen_denied');
+        }
+
+        try {
+            cameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+        } catch (error) {
+            registerViolation('camera_denied');
+        }
+
+        secureModeActive = true;
+        form.style.pointerEvents = 'auto';
+        form.style.opacity = '1';
+        if (securityGate) {
+            securityGate.style.display = 'none';
+        }
+    }
+
+    function formatTime(totalSeconds) {
+        const mins = Math.floor(totalSeconds / 60);
+        const secs = totalSeconds % 60;
+        return String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
+    }
+
+    function tick() {
+        timerNode.textContent = formatTime(Math.max(0, remaining));
+        if (remaining <= 0) {
+            submitExam('timer_completed');
+            return;
+        }
+        remaining -= 1;
+        setTimeout(tick, 1000);
+    }
+
+    if (window.history && window.history.pushState) {
+        window.history.pushState({ examLock: true }, '', window.location.href);
+        window.addEventListener('popstate', function () {
+            registerViolation('back_navigation');
+            window.history.pushState({ examLock: true }, '', window.location.href);
+        });
+    }
+
+    document.addEventListener('fullscreenchange', function () {
+        if (!document.fullscreenElement) {
+            registerViolation('fullscreen_exit');
+        }
+    });
+
+    document.addEventListener('visibilitychange', function () {
+        if (document.hidden) {
+            registerViolation('tab_switch');
+        }
+    });
+
+    window.addEventListener('blur', function () {
+        registerViolation('window_blur');
+    });
+
+    window.addEventListener('beforeunload', function (event) {
+        if (submitted || isSubmittingIntent) {
+            return;
+        }
+        event.preventDefault();
+        event.returnValue = 'Leaving this page will violate exam rules.';
+    });
+
+    form.addEventListener('submit', function () {
+        isSubmittingIntent = true;
+        submitted = true;
+        secureModeActive = false;
+    });
+
+    if (submitBtn) {
+        submitBtn.addEventListener('click', function () {
+            isSubmittingIntent = true;
+            submitted = true;
+            secureModeActive = false;
+        });
+    }
+
+    document.addEventListener('contextmenu', function (event) {
+        event.preventDefault();
+    });
+
+    document.addEventListener('keydown', function (event) {
+        const key = (event.key || '').toLowerCase();
+        if ((event.ctrlKey || event.metaKey) && ['c', 'v', 'x', 'u', 's', 'p'].includes(key)) {
+            event.preventDefault();
+        }
+        if (event.key === 'PrintScreen') {
+            event.preventDefault();
+        }
+    });
+
+    if (secureButton) {
+        secureButton.addEventListener('click', function () {
+            enableSecureMode();
+        });
+    }
+
+    if (mobileToggle && topPanel) {
+        function syncMobileToggleState() {
+            if (window.matchMedia('(max-width: 768px)').matches) {
+                const isHidden = topPanel.classList.contains('is-collapsed');
+                mobileToggle.style.display = 'inline-flex';
+                mobileToggle.textContent = isHidden ? 'Show Exam Info' : 'Hide Exam Info';
+                mobileToggle.setAttribute('aria-expanded', String(!isHidden));
+            } else {
+                mobileToggle.style.display = 'none';
+                topPanel.classList.remove('is-collapsed');
+            }
+        }
+
+        mobileToggle.addEventListener('click', function () {
+            topPanel.classList.toggle('is-collapsed');
+            syncMobileToggleState();
+        });
+
+        syncMobileToggleState();
+        window.addEventListener('resize', syncMobileToggleState);
+    }
+
+    sidebarButtons.forEach(function (button, index) {
+        button.addEventListener('click', function () {
+            goToQuestion(index);
+        });
+    });
+
+    if (prevBtn) {
+        prevBtn.addEventListener('click', function () {
+            goToQuestion(currentIndex - 1);
+        });
+    }
+
+    if (nextBtn) {
+        nextBtn.addEventListener('click', function () {
+            goToQuestion(currentIndex + 1);
+        });
+    }
+
+    if (reviewNextBtn) {
+        reviewNextBtn.addEventListener('click', function () {
+            const activeQuestion = questionPanels[currentIndex];
+            const questionId = activeQuestion.getAttribute('data-question-id');
+            reviewedQuestionIds.add(questionId);
+            refreshQuestionState();
+
+            if (currentIndex === questionPanels.length - 1) {
+                submitExam('review_submit');
+                return;
+            }
+
+            goToQuestion(currentIndex + 1);
+        });
+    }
+
+    questionPanels.forEach(function (panel) {
+        const questionId = panel.getAttribute('data-question-id');
+        const radios = Array.from(panel.querySelectorAll('input[type="radio"]'));
+        radios.forEach(function (radio) {
+            radio.addEventListener('change', function () {
+                reviewedQuestionIds.delete(questionId);
+                refreshQuestionState();
+            });
+        });
+    });
+
+    if (questionPanels.length) {
+        currentIndex = 0;
+        refreshQuestionState();
+        questionPanels[0].hidden = false;
+    }
+
+    tick();
+
+    window.addEventListener('unload', function () {
+        if (cameraStream) {
+            cameraStream.getTracks().forEach(function (track) {
+                track.stop();
+            });
+        }
+    });
+})();
+</script>
+{% endblock %}

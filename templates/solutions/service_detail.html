@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ service.title }} | Prathibha Solutions{% endblock %}
+
+{% block content %}
+<div class="solutions-detail-page">
+<section class="solutions-hero solutions-hero-detail">
+    <div class="solutions-hero-topline">
+        {% include 'partials/icon.html' with icon_id=service.icon_sprite wrapper_class='solutions-hero-icon' %}
+    </div>
+    <h2>{{ service.title }}</h2>
+    <h3>{{ service.summary }}</h3>
+    <p>{{ service.overview }}</p>
+    <div class="solutions-hero-metrics">
+        <article>
+            <h4>Best Fit</h4>
+            <p>{{ service.ideal_for }}</p>
+        </article>
+        <article>
+            <h4>Timeline</h4>
+            <p>{{ service.timeline }}</p>
+        </article>
+    </div>
+    <div class="booking-actions">
+        <a class="auth-btn" href="{% url 'solutions:book' %}?service={{ service.title|urlencode }}">Book Now</a>
+    </div>
+</section>
+
+<section class="solutions-feature-wrap">
+    <h3>Service Components</h3>
+    <div class="solutions-feature-grid">
+        {% for card in service.feature_cards %}
+        <article class="solutions-feature-card solutions-hover-lift">
+            {% include 'partials/icon.html' with icon_id=card.icon_sprite wrapper_class='solutions-feature-icon' %}
+            <h4>{{ card.title }}</h4>
+            <p>{{ card.description }}</p>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="solutions-included-block">
+    <h3>What Is Included With This Service</h3>
+    <div class="solutions-included-grid">
+        {% for point in service.included_points %}
+        <article class="solutions-included-card solutions-hover-lift">
+            {% include 'partials/icon.html' with icon_id=service.icon_sprite wrapper_class='solutions-included-mini' %}
+            <h4>{{ point.title }}</h4>
+            <p>{{ point.text }}</p>
+        </article>
+        {% endfor %}
+    </div>
+    <p class="solutions-price-note"><strong>{{ service.pricing_note }}</strong></p>
+    <p class="solutions-tagline">{{ service.tagline }}</p>
+</section>
+
+<section class="solutions-detail-grid">
+    <article class="solutions-detail-card solutions-contrast-card">
+        {% include 'partials/icon.html' with icon_id=service.icon_sprite wrapper_class='solutions-detail-icon' %}
+        <h3>Who This Is Best For</h3>
+        <p>{{ service.ideal_for }}</p>
+        <h3>Expected Timeline</h3>
+        <p>{{ service.timeline }}</p>
+    </article>
+
+    <article class="solutions-detail-card">
+        {% include 'partials/icon.html' with icon_id='process-flow' wrapper_class='solutions-detail-icon' %}
+        <h3>How We Deliver</h3>
+        <ol class="solutions-process-list">
+            <li>Requirement discussion and scope clarity</li>
+            <li>Design direction and implementation plan</li>
+            <li>Build with iterative updates and reviews</li>
+            <li>Testing, handover, and support guidance</li>
+        </ol>
+    </article>
+</section>
+</div>
+{% endblock %}

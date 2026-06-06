@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block body_class %}theme-home exam-mode{% endblock %}
+
+{% block title %}{{ mock.title }} Result{% endblock %}
+
+{% block content %}
+<section class="exam-page exam-result-page">
+    <div class="exam-header">
+        <h1>{{ mock.title }} - Result</h1>
+        <p>{{ section.title }} - {{ exam.title }}</p>
+    </div>
+
+    {% if external_only %}
+    <article class="result-card">
+        <h3>External Test Link Available</h3>
+        <p>Questions are not configured in admin for this mock yet.</p>
+        {% if mock.test_url %}
+        <p><a class="auth-btn" href="{{ mock.test_url }}" target="_blank" rel="noopener">Open External Test URL</a></p>
+        {% endif %}
+    </article>
+    {% else %}
+    <article class="result-card">
+        <h3>Score</h3>
+        <p class="result-score">{{ percent }}%</p>
+        <p><strong>{{ score }}</strong> / {{ total }} correct</p>
+        {% if attempt %}
+        <p><strong>Attempt:</strong> {{ attempt_number }}</p>
+        <p><strong>Best Score:</strong> {{ best_percent }}%</p>
+        {% if attempt.auto_submitted %}
+        <p class="warning-note">Auto-submitted due to exam rule violation ({{ attempt.auto_submit_reason }}).</p>
+        {% endif %}
+        {% endif %}
+    </article>
+
+    <section class="institute-review-list" style="margin-top:16px;">
+        {% for item in results %}
+        <article class="institute-review-item {% if item.is_correct %}institute-correct{% else %}institute-wrong{% endif %}">
+            <h4>Q{{ item.index }}. {{ item.question_text|safe }}</h4>
+            {% if item.diagram_image %}
+            <img src="{{ item.diagram_image.url }}" alt="Question diagram" class="exam-question-diagram">
+            {% elif item.diagram_image_url %}
+            <img src="{{ item.diagram_image_url }}" alt="Question diagram" class="exam-question-diagram">
+            {% endif %}
+            <p><strong>Your Answer:</strong> {% if item.selected_option %}{{ item.selected_option }}{% else %}Not Answered{% endif %}</p>
+            <p><strong>Correct Answer:</strong> {{ item.correct_option }}</p>
+            {% if item.explanation %}
+            <p><strong>Explanation:</strong> {{ item.explanation|safe }}</p>
+            {% endif %}
+        </article>
+        {% endfor %}
+    </section>
+    {% endif %}
+
+    <p style="margin-top:12px;">
+        <a class="auth-btn" href="{% url 'institute:exam_mock_test' section.id mock.id %}">Retake This Mock</a>
+    </p>
+    <p style="margin-top:12px;">
+        <a class="auth-btn" href="{% url 'institute:exam_attempt_history' %}">View My Attempt History</a>
+    </p>
+    <p style="margin-top:16px;"><a class="auth-btn" href="{% url 'institute:exam_section_detail' section.id %}">Back to Section</a></p>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+window.MathJax = {
+    loader: {
+        load: ['[tex]/mhchem']
+    },
+    tex: {
+        packages: {'[+]': ['mhchem']}
+    },
+    options: {
+        renderActions: {
+            addMenu: []
+        }
+    }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<script>
+(function () {
+    function normalizeChemMarkup(root) {
+        if (!root) {
+            return;
+        }
+
+        const raw = root.innerHTML;
+        if (!raw) {
+            return;
+        }
+
+        const wrapped = raw.replace(/(^|[^$\\])((?:\\ce|\\pu)\{[^{}]*\})/g, function (_, prefix, expr) {
+            return prefix + '\\(' + expr + '\\)';
+        });
+
+        if (wrapped !== raw) {
+            root.innerHTML = wrapped;
+        }
+    }
+
+    function typesetResultContent() {
+        document.querySelectorAll('.exam-result-page h4, .exam-result-page p').forEach(normalizeChemMarkup);
+        if (window.MathJax && window.MathJax.typesetPromise) {
+            window.MathJax.typesetPromise(document.querySelectorAll('.exam-result-page')).catch(function () {});
+        }
+    }
+
+    if (document.readyState === 'complete') {
+        typesetResultContent();
+    } else {
+        window.addEventListener('load', typesetResultContent, { once: true });
+    }
+})();
+</script>
+{% endblock %}

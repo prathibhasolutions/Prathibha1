@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}Complete Online Payment{% endblock %}
+
+{% block content %}
+<section class="section-intro">
+    <h2>Complete Online Payment</h2>
+    <p>Use Razorpay secure checkout to confirm your technology booking instantly.</p>
+</section>
+
+<section class="auth-panel booking-panel">
+    <h3>{{ booking.service_name }}</h3>
+    <p><strong>Booking ID:</strong> {{ booking.id }}</p>
+    <p><strong>Payable Amount:</strong> INR {{ booking.amount_inr }}</p>
+
+    <form id="razorpay-form" action="{{ callback_url }}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="booking_id" value="{{ booking.id }}">
+        <input type="hidden" name="razorpay_order_id" value="{{ booking.razorpay_order_id }}">
+        <input type="hidden" name="razorpay_payment_id" id="razorpay_payment_id">
+        <input type="hidden" name="razorpay_signature" id="razorpay_signature">
+        <button type="button" id="pay-btn" class="auth-submit">Pay Now</button>
+    </form>
+    <p class="booking-note">You are in test mode until live Razorpay credentials are added.</p>
+</section>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    const options = {
+        key: "{{ razorpay_key_id }}",
+        amount: "{{ amount_paise }}",
+        currency: "INR",
+        name: "Prathibha Technologies",
+        description: "Technology service booking payment",
+        order_id: "{{ booking.razorpay_order_id }}",
+        handler: function (response) {
+            document.getElementById("razorpay_payment_id").value = response.razorpay_payment_id;
+            document.getElementById("razorpay_signature").value = response.razorpay_signature;
+            document.getElementById("razorpay-form").submit();
+        },
+        theme: {
+            color: "#1f4f95"
+        }
+    };
+
+    const rzp = new Razorpay(options);
+    document.getElementById("pay-btn").onclick = function (event) {
+        rzp.open();
+        event.preventDefault();
+    };
+</script>
+{% endblock %}

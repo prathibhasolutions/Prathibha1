@@ -1,0 +1,26 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block content %}
+<div id="content-main">
+    <div class="module" style="margin-bottom: 20px;">
+        <h2>{% trans "Quick Links" %}</h2>
+        <ul style="margin: 0; padding-left: 18px; line-height: 1.9;">
+            <li><a href="/" target="_blank" rel="noopener">Open Website Home</a></li>
+            <li><a href="/services/" target="_blank" rel="noopener">Open Services Page</a></li>
+            <li><a href="/technologies/" target="_blank" rel="noopener">Open Technologies Page</a></li>
+            <li><a href="/institute/" target="_blank" rel="noopener">Open Institute Page</a></li>
+            <li><a href="/solutions/" target="_blank" rel="noopener">Open Solutions Page</a></li>
+            <li><a href="/admin/services/">Services Admin</a></li>
+            <li><a href="/admin/technologies/">Technologies Admin</a></li>
+            <li><a href="/admin/solutions/">Solutions Admin</a></li>
+        </ul>
+    </div>
+
+    {% if app_list %}
+        {% include "admin/app_list.html" with app_list=app_list show_changelinks=True %}
+    {% else %}
+        <p>{% trans "You do not have permission to view or edit anything." %}</p>
+    {% endif %}
+</div>
+{% endblock %}

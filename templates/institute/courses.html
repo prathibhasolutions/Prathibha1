@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}All Courses | Prathibha Institute{% endblock %}
+
+{% block content %}
+<section class="section-intro">
+	<h2>All Courses</h2>
+	<p>Browse every course offered by Prathibha Institute in one dedicated page.</p>
+</section>
+
+
+{% for section in course_sections %}
+<section class="institute-catalog">
+	<div class="institute-catalog-head">
+		<h3>{{ section.title }}</h3>
+		<p>{{ section.description }}</p>
+	</div>
+
+	<div class="cards institute-grid">
+		{% for course in section.courses %}
+		{% if course.detail_available %}
+		<a class="card card-service" href="{% url 'institute:course_detail' course.slug %}">
+			<div class="card-heading-row">{% include 'partials/icon.html' with icon_id=course.icon_sprite %}<h3>{{ course.title }}</h3></div>
+			<p>{{ course.summary }}</p>
+			<span class="card-link">View Course</span>
+		</a>
+		{% else %}
+		<article class="card card-service">
+			<div class="card-heading-row">{% include 'partials/icon.html' with icon_id=course.icon_sprite %}<h3>{{ course.title }}</h3></div>
+			<p>{{ course.summary }}</p>
+			<span class="card-link">Course details coming soon</span>
+		</article>
+		{% endif %}
+		{% endfor %}
+	</div>
+</section>
+{% empty %}
+<section class="institute-catalog">
+	<div class="institute-catalog-head">
+		<h3>No Courses Available</h3>
+		<p>Course catalog is being updated. Please check again shortly.</p>
+	</div>
+</section>
+{% endfor %}
+{% endblock %}

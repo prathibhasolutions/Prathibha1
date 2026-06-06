@@ -1,0 +1,436 @@
+{% extends 'base.html' %}
+
+{% block title %}Technician Dashboard{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<style>
+    .tech-map {
+        height: 260px;
+        width: 100%;
+        margin-top: 14px;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, .12);
+        overflow: hidden;
+    }
+
+    .tech-map-note {
+        margin-top: 10px;
+        color: #c7d2e8;
+        font-size: .9rem;
+    }
+
+    .vehicle-marker {
+        width: 30px;
+        height: 30px;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        background: rgba(6, 182, 212, .18);
+        border: 1px solid rgba(6, 182, 212, .55);
+        box-shadow: 0 8px 24px rgba(6, 182, 212, .28);
+        backdrop-filter: blur(6px);
+    }
+
+    .vehicle-marker__icon {
+        font-size: 18px;
+        line-height: 1;
+        transform-origin: center;
+        transition: transform .55s ease;
+        filter: drop-shadow(0 3px 6px rgba(0, 0, 0, .28));
+    }
+
+    @media (max-width: 768px) {
+        .tech-map {
+            height: 220px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="section-intro">
+    <h2>Technician Dashboard</h2>
+    <p>Receive orders, accept requests, and share live movement updates with customers.</p>
+</section>
+
+<section>
+    <h3>Incoming Orders</h3>
+    {% if incoming_bookings %}
+    <div class="cards services-grid">
+        {% for booking in incoming_bookings %}
+        <article class="card card-service">
+            <h3>{{ booking.service_name }}</h3>
+            <p><strong>Customer:</strong> {{ booking.customer_name }}</p>
+            <p><strong>Phone:</strong> {{ booking.phone_number }}</p>
+            <p><strong>Address:</strong> {{ booking.address_line }}</p>
+            <p><strong>Schedule:</strong> {{ booking.preferred_date }} at {{ booking.preferred_time }}</p>
+            <form method="post" action="{% url 'services:technician_accept_booking' booking.id %}" class="inline-form">
+                {% csrf_token %}
+                <button type="submit" class="auth-submit">Accept Order</button>
+            </form>
+        </article>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="section-contact">No pending orders right now.</p>
+    {% endif %}
+</section>
+
+<section>
+    <h3>My Active Orders</h3>
+    {% if my_active_bookings %}
+    <div class="cards services-grid" id="tech-live-grid">
+        {% for booking in my_active_bookings %}
+        <article
+            class="card card-service"
+            data-booking-id="{{ booking.id }}"
+            data-customer-lat="{{ booking.customer_latitude|default:'' }}"
+            data-customer-lng="{{ booking.customer_longitude|default:'' }}"
+            data-tech-lat="{{ booking.technician_latitude|default:'' }}"
+            data-tech-lng="{{ booking.technician_longitude|default:'' }}"
+        >
+            <h3>{{ booking.service_name }} - #{{ booking.id }}</h3>
+            <p><strong>Status:</strong> <span class="status-pill status-{{ booking.status }}">{{ booking.get_status_display }}</span></p>
+            <p><strong>Customer:</strong> {{ booking.customer_name }}</p>
+            <p><strong>Location:</strong> {{ booking.address_line }}</p>
+            <p><strong>Live Stream:</strong> <span class="tech-stream-state">Stopped</span></p>
+            <p><strong>Distance:</strong> <span class="tech-distance">Waiting for location data</span></p>
+            <p><strong>ETA:</strong> <span class="tech-eta">ETA unavailable</span></p>
+            <p><strong>Last shared location:</strong> <span class="tech-last-update">{{ booking.technician_location_updated_at|default:'Not shared yet' }}</span></p>
+            <div class="booking-actions">
+                <button type="button" class="auth-btn start-live-btn">Start Live Location</button>
+                <button type="button" class="auth-btn auth-btn-google stop-live-btn">Stop Live Location</button>
+                <a class="auth-btn tech-route-link" href="#" target="_blank" rel="noopener">Open Route</a>
+            </div>
+            <div class="tech-map"></div>
+            <p class="tech-map-note">Map will show your live position and destination route.</p>
+        </article>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="section-contact">No active accepted orders yet.</p>
+    {% endif %}
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+(function () {
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) {
+            return parts.pop().split(';').shift();
+        }
+        return '';
+    }
+
+    const csrfToken = getCookie('csrftoken') || '{{ csrf_token }}';
+    const watchers = new Map();
+    const mapRegistry = new Map();
+    const hasLeaflet = typeof window.L !== 'undefined';
+
+    function createVehicleMarker(latLng, rotation) {
+        const marker = L.marker(latLng, {
+            icon: L.divIcon({
+                className: 'vehicle-marker-wrap',
+                html: `<div class="vehicle-marker"><span class="vehicle-marker__icon" style="transform: rotate(${rotation}deg)">🚚</span></div>`,
+                iconSize: [30, 30],
+                iconAnchor: [15, 15],
+            }),
+        });
+        marker._vehicleRotation = rotation;
+        return marker;
+    }
+
+    function updateVehicleMarker(marker, latLng, rotation) {
+        marker.setLatLng(latLng);
+        const iconNode = marker.getElement()?.querySelector('.vehicle-marker__icon');
+        if (iconNode) {
+            iconNode.style.transform = `rotate(${rotation}deg)`;
+        }
+        marker._vehicleRotation = rotation;
+    }
+
+    function getHeadingDegrees(fromPoint, toPoint) {
+        if (!fromPoint || !toPoint) {
+            return 0;
+        }
+
+        const deltaLat = toPoint[0] - fromPoint[0];
+        const deltaLng = toPoint[1] - fromPoint[1];
+        if (Math.abs(deltaLat) < 0.000001 && Math.abs(deltaLng) < 0.000001) {
+            return 0;
+        }
+
+        return Math.atan2(deltaLng, deltaLat) * (180 / Math.PI);
+    }
+
+    function toNum(value) {
+        if (value === null || value === undefined || value === '') {
+            return null;
+        }
+        const parsed = Number(value);
+        return Number.isFinite(parsed) ? parsed : null;
+    }
+
+    function getRouteUrl(data) {
+        const destLat = data.customer_latitude;
+        const destLng = data.customer_longitude;
+        if (destLat === null || destLat === undefined || destLng === null || destLng === undefined) {
+            return null;
+        }
+
+        const originLat = data.technician_latitude;
+        const originLng = data.technician_longitude;
+        if (originLat === null || originLat === undefined || originLng === null || originLng === undefined) {
+            return `https://www.google.com/maps/dir/?api=1&destination=${destLat},${destLng}&travelmode=driving`;
+        }
+
+        return `https://www.google.com/maps/dir/?api=1&origin=${originLat},${originLng}&destination=${destLat},${destLng}&travelmode=driving`;
+    }
+
+    function ensureMap(card) {
+        if (!hasLeaflet) {
+            return null;
+        }
+
+        const bookingId = card.dataset.bookingId;
+        if (mapRegistry.has(bookingId)) {
+            return mapRegistry.get(bookingId);
+        }
+
+        const mapContainer = card.querySelector('.tech-map');
+        if (!mapContainer) {
+            return null;
+        }
+
+        const map = L.map(mapContainer).setView([20.5937, 78.9629], 5);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        const instance = {
+            map,
+            customerMarker: null,
+            technicianMarker: null,
+            routeLine: null,
+            lastTechnicianPoint: null,
+        };
+        mapRegistry.set(bookingId, instance);
+        return instance;
+    }
+
+    function renderCardTracking(card, data) {
+        const distanceNode = card.querySelector('.tech-distance');
+        const etaNode = card.querySelector('.tech-eta');
+        const routeLink = card.querySelector('.tech-route-link');
+        const mapNoteNode = card.querySelector('.tech-map-note');
+
+        if (distanceNode) {
+            distanceNode.textContent = (data.distance_km === null || data.distance_km === undefined)
+                ? 'Waiting for location data'
+                : `${data.distance_km} km`;
+        }
+
+        if (etaNode) {
+            etaNode.textContent = (data.eta_minutes === null || data.eta_minutes === undefined)
+                ? 'ETA unavailable'
+                : `${data.eta_minutes} minutes`;
+        }
+
+        const routeUrl = getRouteUrl(data);
+        if (routeLink) {
+            if (routeUrl) {
+                routeLink.href = routeUrl;
+                routeLink.style.opacity = '1';
+                routeLink.style.pointerEvents = 'auto';
+            } else {
+                routeLink.href = '#';
+                routeLink.style.opacity = '.6';
+                routeLink.style.pointerEvents = 'none';
+            }
+        }
+
+        const hasCustomer = data.customer_latitude !== null && data.customer_longitude !== null;
+        const hasTechnician = data.technician_latitude !== null && data.technician_longitude !== null;
+
+        if (mapNoteNode) {
+            if (hasTechnician) {
+                mapNoteNode.textContent = `Your live location: ${Number(data.technician_latitude).toFixed(6)}, ${Number(data.technician_longitude).toFixed(6)}`;
+            } else if (hasCustomer) {
+                mapNoteNode.textContent = 'Destination visible. Start live location to show your movement.';
+            } else {
+                mapNoteNode.textContent = 'Destination coordinates missing in booking address.';
+            }
+        }
+
+        const instance = ensureMap(card);
+        if (!instance) {
+            return;
+        }
+
+        const points = [];
+        if (hasCustomer) {
+            const destination = [data.customer_latitude, data.customer_longitude];
+            if (!instance.customerMarker) {
+                instance.customerMarker = L.marker(destination).addTo(instance.map).bindPopup('Customer Destination');
+            } else {
+                instance.customerMarker.setLatLng(destination);
+            }
+            points.push(destination);
+        }
+
+        if (hasTechnician) {
+            const current = [data.technician_latitude, data.technician_longitude];
+            const rotation = getHeadingDegrees(instance.lastTechnicianPoint, current);
+            if (!instance.technicianMarker) {
+                instance.technicianMarker = createVehicleMarker(current, rotation).addTo(instance.map).bindPopup('Your Current Location');
+            } else {
+                updateVehicleMarker(instance.technicianMarker, current, rotation);
+            }
+            instance.lastTechnicianPoint = current;
+            points.push(current);
+        }
+
+        if (instance.routeLine) {
+            instance.map.removeLayer(instance.routeLine);
+            instance.routeLine = null;
+        }
+
+        if (hasCustomer && hasTechnician) {
+            instance.routeLine = L.polyline([
+                [data.technician_latitude, data.technician_longitude],
+                [data.customer_latitude, data.customer_longitude],
+            ], {
+                color: '#06b6d4',
+                weight: 4,
+                opacity: .85,
+            }).addTo(instance.map);
+            instance.map.fitBounds(instance.routeLine.getBounds(), {padding: [28, 28]});
+        } else if (points.length === 1) {
+            instance.map.setView(points[0], 15);
+        }
+    }
+
+    function sendLocation(bookingId, latitude, longitude, card) {
+        return fetch(`/services/technician/update-location/${bookingId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            body: JSON.stringify({latitude, longitude}),
+        })
+        .then(resp => resp.json())
+        .then(data => {
+            if (data.error) {
+                throw new Error(data.error);
+            }
+            const statusNode = card.querySelector('.status-pill');
+            const updatedNode = card.querySelector('.tech-last-update');
+            if (statusNode && data.status_display) {
+                statusNode.textContent = data.status_display;
+            }
+            if (updatedNode) {
+                updatedNode.textContent = data.technician_location_updated_at || 'Just now';
+            }
+
+            card.dataset.techLat = data.technician_latitude ?? '';
+            card.dataset.techLng = data.technician_longitude ?? '';
+            renderCardTracking(card, data);
+        });
+    }
+
+    function startTracking(card) {
+        const bookingId = card.dataset.bookingId;
+        if (watchers.has(bookingId)) {
+            return;
+        }
+
+        const streamNode = card.querySelector('.tech-stream-state');
+
+        if (!navigator.geolocation) {
+            alert('Geolocation is not supported in this browser.');
+            return;
+        }
+
+        const watchId = navigator.geolocation.watchPosition(
+            function (position) {
+                const lat = Number(position.coords.latitude).toFixed(6);
+                const lng = Number(position.coords.longitude).toFixed(6);
+                sendLocation(bookingId, lat, lng, card)
+                    .then(function () {
+                        if (streamNode) {
+                            streamNode.textContent = 'Live';
+                        }
+                    })
+                    .catch(function (err) {
+                        if (streamNode) {
+                            streamNode.textContent = 'Error';
+                        }
+                        console.error('Live location update failed:', err);
+                    });
+            },
+            function () {
+                alert('Unable to read location. Please allow location access.');
+                if (streamNode) {
+                    streamNode.textContent = 'Permission denied';
+                }
+            },
+            {
+                enableHighAccuracy: true,
+                maximumAge: 5000,
+                timeout: 10000,
+            }
+        );
+
+        watchers.set(bookingId, watchId);
+        if (streamNode) {
+            streamNode.textContent = 'Starting...';
+        }
+    }
+
+    function stopTracking(card) {
+        const bookingId = card.dataset.bookingId;
+        const watchId = watchers.get(bookingId);
+        const streamNode = card.querySelector('.tech-stream-state');
+        if (watchId !== undefined) {
+            navigator.geolocation.clearWatch(watchId);
+            watchers.delete(bookingId);
+        }
+        if (streamNode) {
+            streamNode.textContent = 'Stopped';
+        }
+    }
+
+    document.querySelectorAll('#tech-live-grid .card').forEach(function (card) {
+        const startBtn = card.querySelector('.start-live-btn');
+        const stopBtn = card.querySelector('.stop-live-btn');
+        if (startBtn) {
+            startBtn.addEventListener('click', function () {
+                startTracking(card);
+            });
+        }
+        if (stopBtn) {
+            stopBtn.addEventListener('click', function () {
+                stopTracking(card);
+            });
+        }
+
+        renderCardTracking(card, {
+            customer_latitude: toNum(card.dataset.customerLat),
+            customer_longitude: toNum(card.dataset.customerLng),
+            technician_latitude: toNum(card.dataset.techLat),
+            technician_longitude: toNum(card.dataset.techLng),
+            distance_km: null,
+            eta_minutes: null,
+        });
+    });
+})();
+</script>
+{% endblock %}

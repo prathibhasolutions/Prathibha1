@@ -1,0 +1,32 @@
+{% extends 'admin/change_list.html' %}
+
+{% block content_title %}
+{{ block.super }}
+{% if analytics_cards %}
+<div style="margin-top:14px; display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px;">
+    {% for card in analytics_cards %}
+    <div style="border:1px solid rgba(0,0,0,.12); border-radius:10px; padding:12px; background:#fff;">
+        <div style="font-size:12px; color:#666;">{{ card.label }}</div>
+        <div style="font-size:22px; font-weight:600; margin-top:4px;">{{ card.value }}</div>
+    </div>
+    {% endfor %}
+</div>
+{% if topper_item %}
+<div style="margin-top:10px; font-size:13px;">
+    Topper: <strong>{{ topper_item.student }}</strong> | {{ topper_item.mock }} | {{ topper_item.percent }}%
+</div>
+{% endif %}
+{% endif %}
+
+{% if exam_breakdowns %}
+<div style="margin-top:18px; display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:10px;">
+    {% for item in exam_breakdowns %}
+    <a href="{{ item.url }}" style="border:1px solid rgba(0,0,0,.12); border-radius:10px; padding:12px; background:#fff; text-decoration:none; color:inherit; display:block;">
+        <div style="font-size:12px; color:#666;">{{ item.exam.title }}</div>
+        <div style="font-size:22px; font-weight:600; margin-top:4px;">{{ item.count }}</div>
+        <div style="font-size:12px; color:#666; margin-top:4px;">View exam-wise student scores</div>
+    </a>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

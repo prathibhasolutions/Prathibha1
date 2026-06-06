@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}My Exam Attempts{% endblock %}
+
+{% block content %}
+<section class="section-intro">
+    <h2>My Mock Test Attempts</h2>
+    <p>All your submitted mock attempts are saved here. You can retake any mock from its section page.</p>
+</section>
+
+<section class="institute-catalog">
+    {% if attempts %}
+    <div class="cards institute-grid">
+        {% for item in attempts %}
+        <article class="card card-service">
+            <div class="card-heading-row">
+                <h3>{{ item.mock.title }}</h3>
+            </div>
+            <p><strong>Exam:</strong> {{ item.mock.section.exam.title }}</p>
+            <p><strong>Section:</strong> {{ item.mock.section.title }}</p>
+            <p><strong>Score:</strong> {{ item.score }} / {{ item.total_questions }} ({{ item.percent }}%)</p>
+            <p><strong>Submitted:</strong> {{ item.submitted_at }}</p>
+            {% if item.auto_submitted %}
+            <p class="warning-note">Auto-submitted due to: {{ item.auto_submit_reason }}</p>
+            {% endif %}
+            <a class="auth-btn" href="{% url 'institute:exam_mock_test' item.mock.section.id item.mock.id %}">Retake Mock</a>
+        </article>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="warning-note">No attempts yet. Start a mock from Exams.</p>
+    {% endif %}
+</section>
+{% endblock %}

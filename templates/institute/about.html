@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}About Prathibha Institute{% endblock %}
+
+{% block content %}
+
+<section class="section-intro">
+    <h2>About Prathibha Institute</h2>
+    <p>
+        Empowering students through quality education,
+        innovation, practical training, and career-focused learning.
+    </p>
+</section>
+
+<section class="institute-about-page">
+
+    <div class="institute-info-card">
+        <h3>Welcome to Prathibha Institute</h3>
+
+        <p>
+            Welcome to <strong>Prathibha Institute</strong>, a distinguished educational
+            institution committed to shaping futures and fostering innovation.
+            Our mission is to provide a transformative learning experience
+            that equips students with the skills, knowledge, and mindset
+            needed to thrive in an ever-evolving world.
+        </p>
+    </div>
+
+    <div class="institute-catalog-head">
+        <h3>Our Founders</h3>
+        <p>
+            Meet the visionaries who laid the foundation for our institute,
+            bringing with them years of experience in education and industry.
+        </p>
+    </div>
+
+    <div class="founders-grid">
+
+        <div class="founder-card">
+            <div class="founder-row">
+                <img src="{% static 'images/founder-shravan.jpg' %}" data-fallback="{% static 'images/founder-placeholder.svg' %}" onerror="this.onerror=null;this.src=this.dataset.fallback;" alt="Shravan - Co-Founder" class="founder-avatar">
+                <div class="founder-meta">
+                    <h3>Shravan</h3>
+                    <span>Co-Founder</span>
+
+                    <p>
+                        Bachelor of Technology in Mechanical Engineering,
+                        NIT Warangal (2020)
+                    </p>
+
+                    <ul>
+                        <li>Ex-Officer at HPCL (A Maharatna Company)</li>
+                        <li>GATE 2021 AIR 669</li>
+                        <li>JEE Mains 2016 – 99.58 Percentile</li>
+                        <li>TS EAMCET Rank 517</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="founder-card">
+            <div class="founder-row">
+                <img src="{% static 'images/founder-akhilesh.jpg' %}" data-fallback="{% static 'images/founder-placeholder.svg' %}" onerror="this.onerror=null;this.src=this.dataset.fallback;" alt="Akhilesh - Co-Founder" class="founder-avatar">
+                <div class="founder-meta">
+                    <h3>Akhilesh</h3>
+                    <span>Co-Founder</span>
+
+                    <p>
+                        Bachelor of Technology in Electrical &
+                        Electronics Engineering (2020)
+                    </p>
+
+                    <ul>
+                        <li>SSC CGL 2022</li>
+                        <li>IBPS PO 2021</li>
+                        <li>TSPSC Group-4 (2023)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="founder-card">
+            <div class="founder-row">
+                <img src="{% static 'images/founder-shashank.jpg' %}" data-fallback="{% static 'images/founder-placeholder.svg' %}" onerror="this.onerror=null;this.src=this.dataset.fallback;" alt="Shashank Reddy - Co-Founder" class="founder-avatar">
+                <div class="founder-meta">
+                    <h3>Shashank Reddy</h3>
+                    <span>Co-Founder</span>
+
+                    <p>
+                        Bachelor of Technology in Mechanical Engineering (2020)
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="institute-info-card">
+        <h3>Our Achievements</h3>
+
+        <ul class="achievement-list">
+            <li>75+ Students Successfully Completed Training</li>
+            <li>State-of-the-Art Infrastructure</li>
+            <li>Modern Teaching Methodologies</li>
+            <li>Industry-Relevant Courses</li>
+            <li>Practical and Career-Oriented Training</li>
+        </ul>
+    </div>
+
+    <div class="mission-grid">
+
+        <div class="institute-info-card">
+            <h3>Our Mission</h3>
+
+            <p>
+                At Prathibha Institute, we strive to inspire and empower
+                individuals through quality education.
+            </p>
+
+            <p>
+                We create a dynamic and inclusive learning environment
+                that nurtures intellectual curiosity, creativity,
+                and critical thinking.
+            </p>
+        </div>
+
+        <div class="institute-info-card">
+            <h3>Our Vision</h3>
+
+            <p>
+                Our vision is to be a leading institution of academic
+                excellence recognized for innovation, research,
+                and global impact.
+            </p>
+
+            <p>
+                We aim to cultivate a community of forward-thinking
+                individuals who contribute meaningfully to society.
+            </p>
+        </div>
+
+    </div>
+
+    <div class="institute-catalog-head">
+        <h3>Core Values</h3>
+    </div>
+
+    <div class="values-grid">
+
+        <div class="value-card">Excellence</div>
+        <div class="value-card">Innovation</div>
+        <div class="value-card">Integrity</div>
+        <div class="value-card">Inclusivity</div>
+        <div class="value-card">Continuous Learning</div>
+        <div class="value-card">Empathy</div>
+        <div class="value-card">Accountability</div>
+        <div class="value-card">Teamwork</div>
+
+    </div>
+
+</section>
+
+{% endblock %}

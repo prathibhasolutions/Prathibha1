@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ course.title }} | Prathibha Institute{% endblock %}
+
+{% block content %}
+<section class="solutions-hero institute-hero">
+    <p class="solutions-label">Prathibha Institute</p>
+    <h2>{% include 'partials/icon.html' with icon_id=course.icon_sprite %} {{ course.title }}</h2>
+    <p>{{ course.overview }}</p>
+</section>
+
+<section class="institute-course-layout">
+    <article class="solutions-detail-card">
+        <h3>Complete Syllabus</h3>
+        <ol class="institute-syllabus-list">
+            {% for topic in course.syllabus %}
+            <li>{{ topic }}</li>
+            {% endfor %}
+        </ol>
+    </article>
+
+    <article class="solutions-detail-card">
+        <h3>Course Actions</h3>
+        <p>Old course-wise mock buttons are removed. Use the latest exam mocks added in the Exams section.</p>
+        <div class="institute-mock-links">
+            {% for exam_mock in exam_mock_links %}
+            <a class="auth-btn" href="{% url 'institute:exam_mock_test' exam_mock.section.id exam_mock.id %}">
+                {{ exam_mock.section.exam.title }} - {{ exam_mock.section.title }} - {{ exam_mock.title }}
+            </a>
+            {% empty %}
+            <span class="warning-note">No exam mocks added yet in Exams section.</span>
+            {% endfor %}
+        </div>
+    </article>
+</section>
+{% endblock %}

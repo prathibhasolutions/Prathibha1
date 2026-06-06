@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}Certificate Verification{% endblock %}
+
+{% block content %}
+<section class="section-intro" id="certificates">
+    <h2>Certificate Verification</h2>
+    <p>Enter student certificate ID to verify completion details and preview the certificate.</p>
+</section>
+
+<section class="institute-cert-section">
+    <div class="institute-cert-copy">
+        <form id="certificate-search-form" class="institute-certificate-search" autocomplete="off">
+            <input id="certificate-id-input" class="contact-input" type="text" placeholder="Enter Certificate ID" aria-label="Enter Certificate ID">
+            <button type="submit" class="auth-btn">Search Certificate</button>
+        </form>
+
+        <div id="certificate-result-left" class="institute-certificate-result" hidden>
+            <h4 id="certificate-result-title">Certificate Found</h4>
+            <p><strong>Student:</strong> <span id="certificate-student-name"></span></p>
+            <p><strong>Course:</strong> <span id="certificate-course-name"></span></p>
+            <p><strong>Certificate ID:</strong> <span id="certificate-id-value"></span></p>
+            <p><strong>Completed On:</strong> <span id="certificate-completed-on"></span></p>
+        </div>
+    </div>
+    <div class="institute-cert-image-wrap" id="certificate-result-right">
+        <img id="certificate-result-image" src="{{ default_certificate_image_url }}" alt="Certificate preview" class="institute-cert-image">
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+{{ certificate_records|json_script:"certificate-records" }}
+<script>
+(function () {
+    const recordsNode = document.getElementById('certificate-records');
+    if (!recordsNode) {
+        return;
+    }
+
+    const records = JSON.parse(recordsNode.textContent || '[]');
+    const recordMap = new Map(records.map(function (item) {
+        return [String(item.certificate_id || '').trim().toLowerCase(), item];
+    }));
+
+    const form = document.getElementById('certificate-search-form');
+    const input = document.getElementById('certificate-id-input');
+    const resultBox = document.getElementById('certificate-result-left');
+    const resultTitle = document.getElementById('certificate-result-title');
+    const studentNameEl = document.getElementById('certificate-student-name');
+    const courseNameEl = document.getElementById('certificate-course-name');
+    const certIdEl = document.getElementById('certificate-id-value');
+    const completedOnEl = document.getElementById('certificate-completed-on');
+    const imageEl = document.getElementById('certificate-result-image');
+    const defaultImage = imageEl ? imageEl.getAttribute('src') : '';
+
+    if (!form || !input || !resultBox || !resultTitle || !imageEl) {
+        return;
+    }
+
+    form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        const key = String(input.value || '').trim().toLowerCase();
+        const record = recordMap.get(key);
+
+        resultBox.hidden = false;
+
+        if (!record) {
+            resultTitle.textContent = 'Invalid Certificate ID';
+            studentNameEl.textContent = '-';
+            courseNameEl.textContent = 'No matching course found';
+            certIdEl.textContent = input.value || '-';
+            completedOnEl.textContent = '-';
+            imageEl.setAttribute('src', defaultImage);
+            return;
+        }
+
+        resultTitle.textContent = 'Certificate Found';
+        studentNameEl.textContent = record.student_name || '-';
+        courseNameEl.textContent = record.course_name || '-';
+        certIdEl.textContent = record.certificate_id || '-';
+        completedOnEl.textContent = record.completed_on || '-';
+        imageEl.setAttribute('src', record.certificate_image_url || defaultImage);
+    });
+})();
+</script>
+{% endblock %}

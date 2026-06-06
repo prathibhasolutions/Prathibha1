@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Prathibha Solutions{% endblock %}
+
+{% block content %}
+<section class="solutions-hero">
+    <p class="solutions-label">Prathibha Solutions</p>
+    <h2>Digital Products Built For Real Business Growth</h2>
+    <p>We design and develop websites, web applications, and digital assets for startups, local brands, and growing companies. Our focus is practical solutions with measurable outcomes.</p>
+</section>
+
+<section class="solutions-services">
+    <h3>Our Core Services</h3>
+    <div class="cards solutions-grid">
+        {% for service in solution_services %}
+        <article class="card card-service card-clickable">
+            <div class="card-badge-wrap">{% include 'partials/icon.html' with icon_id=service.icon_sprite %}</div>
+            <h3>{{ service.title }}</h3>
+            <p>{{ service.summary }}</p>
+            <p class="solutions-card-meta"><strong>Best For:</strong> {{ service.ideal_for|truncatechars:85 }}</p>
+            <div class="booking-actions">
+                <a class="card-link" href="{% url 'solutions:service_detail' service.slug %}">Learn More</a>
+                <a class="card-link" href="{% url 'solutions:book' %}?service={{ service.title|urlencode }}">Book Now</a>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="solutions-highlights">
+    <article class="solutions-highlight-card">
+        <span class="solutions-highlight-icon">✨</span>
+        <h4>Why Clients Choose Us</h4>
+        <ul>
+            <li>Clear communication and milestone-based execution</li>
+            <li>Affordable plans for startups and small businesses</li>
+            <li>Fast turnaround without compromising quality</li>
+            <li>Post-launch support and continuous improvements</li>
+        </ul>
+    </article>
+    <article class="solutions-highlight-card">
+        <span class="solutions-highlight-icon">🧩</span>
+        <h4>How We Work</h4>
+        <ul>
+            <li>Requirement call and scope planning</li>
+            <li>Wireframe and design approval</li>
+            <li>Development with regular progress updates</li>
+            <li>Testing, launch, and support handover</li>
+        </ul>
+    </article>
+</section>
+
+<section class="solutions-cta">
+    <h3>Need a Website or Web Application?</h3>
+    <p>Tell us your idea and we will prepare a practical, budget-aware plan.</p>
+    <p><strong>Call:</strong> +91 95429 06390</p>
+    <p><strong>Email:</strong> prathibhasolutions1@gmail.com</p>
+    <p><strong>Website:</strong> www.prathibhasolutions.com</p>
+</section>
+{% endblock %}

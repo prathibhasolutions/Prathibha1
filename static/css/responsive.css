@@ -1,0 +1,701 @@
+/* =========================
+   RESPONSIVE DESIGN
+========================= */
+
+@media (max-width: 1200px) {
+
+    :root {
+        --bg-video-scale: 1.06;
+        --bg-video-y: 46%;
+        --bg-video-opacity: .54;
+    }
+
+    .container {
+        width: 95%;
+    }
+
+}
+
+@media (max-width: 992px) {
+
+    :root {
+        --bg-video-scale: 1.04;
+        --bg-video-y: 42%;
+        --bg-video-opacity: .48;
+    }
+
+    .site-header .container {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .header-right {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .auth-btn,
+    .auth-submit {
+        font-size: .92rem;
+        padding: 11px 20px;
+    }
+
+    .institute-header-links {
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .institute-quick-dropdown-menu {
+        right: auto;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .cards,
+    .solutions-feature-grid,
+    .solutions-detail-grid,
+    .solutions-included-grid {
+        grid-template-columns: repeat(2,1fr);
+    }
+
+    .site-title {
+        text-align: center;
+    }
+
+    .header-left {
+        justify-content: center;
+    }
+
+    .institute-course-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .exam-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .exam-sidebar {
+        position: static;
+    }
+
+    .exam-number-grid {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+
+    .students-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .student-photo-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    body.theme-services {
+        --bg-video-y: 46%;
+    }
+
+    body.theme-technologies {
+        --bg-video-y: 40%;
+        --bg-video-scale: 1.06;
+    }
+
+    body.theme-institute {
+        --bg-video-y: 34%;
+    }
+
+    body.theme-solutions {
+        --bg-video-y: 46%;
+        --bg-video-scale: 1.03;
+    }
+
+}
+
+@media (max-width: 768px) {
+
+    :root {
+        --bg-video-scale: 1.03;
+        --bg-video-y: 36%;
+        --bg-video-opacity: .44;
+    }
+
+    body.theme-home {
+        background-position:
+            center top,
+            center top,
+            center top,
+            center top,
+            center top;
+    }
+
+    .bg-video-layer::after {
+        opacity: .08;
+        background-size: 36px 36px, 36px 36px;
+    }
+
+    .bg-video {
+        object-position: center var(--bg-video-y);
+    }
+
+    .theme-solutions .bg-video {
+        opacity: .72;
+        filter: saturate(1.08) contrast(1.04) brightness(1.05);
+    }
+
+    section {
+        margin: 24px 0;
+    }
+
+    .section-intro {
+        padding: 20px;
+        margin-bottom: 14px;
+    }
+
+    .section-intro h2 {
+        font-size: clamp(1.65rem, 1.2rem + 2.2vw, 2.2rem);
+    }
+
+    .section-intro p {
+        font-size: .95rem;
+        line-height: 1.75;
+    }
+
+    .cards,
+    .solutions-feature-grid,
+    .solutions-detail-grid,
+    .solutions-included-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        margin-top: 8px;
+    }
+
+    .institute-grid {
+        grid-template-columns: 1fr;
+        justify-content: stretch;
+    }
+
+    .card {
+        padding: 16px;
+        border-radius: 20px;
+    }
+
+    .card-logo {
+        width: 90px;
+        height: 90px;
+    }
+
+    .institute-quick-link {
+        min-width: calc(50% - 8px);
+        padding: 10px 14px;
+    }
+
+    body.theme-institute .brand-mark-image {
+        width: 42px;
+        height: 42px;
+    }
+
+    .institute-inline-links {
+        flex-direction: column;
+    }
+
+    .institute-certificate-search {
+        flex-direction: column;
+    }
+
+    .institute-gallery-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .institute-contact-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .institute-feature-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .institute-feature-card,
+    .institute-feature-card:nth-child(4),
+    .institute-feature-card:nth-child(5) {
+        grid-column: span 1;
+    }
+
+    .institute-cert-section {
+        grid-template-columns: 1fr;
+    }
+
+    .auth-panel {
+        padding: 20px;
+        border-radius: 22px;
+    }
+
+    .solutions-hero {
+        padding: 22px;
+        border-radius: 24px;
+    }
+
+    .solutions-detail-page {
+        gap: 12px;
+    }
+
+    .exam-mobile-toggle {
+        display: inline-flex;
+        align-self: flex-end;
+    }
+
+    .exam-top-panel {
+        margin-bottom: 12px;
+    }
+
+    .exam-page {
+        padding: 24px 0;
+    }
+
+    .institute-hero {
+        margin-bottom: 12px;
+    }
+
+    .institute-test-setup {
+        margin-bottom: 10px;
+        gap: 10px;
+    }
+
+    .institute-options {
+        gap: 8px;
+    }
+
+    .booking-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .exam-controls {
+        flex-direction: column;
+    }
+
+    .exam-nav-btn,
+    .exam-submit-btn {
+        width: 100%;
+    }
+
+    .student-photo-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    body.theme-services {
+        --bg-video-y: 40%;
+        --bg-video-scale: 1.04;
+    }
+
+    body.theme-technologies {
+        --bg-video-y: 32%;
+        --bg-video-scale: 1.08;
+    }
+
+    body.theme-institute {
+        --bg-video-y: 28%;
+        --bg-video-scale: 1.08;
+    }
+
+    body.theme-solutions {
+        --bg-video-y: 42%;
+        --bg-video-scale: 1.02;
+    }
+
+}
+
+@media (max-width: 576px) {
+
+    :root {
+        --bg-video-scale: 1.01;
+        --bg-video-y: 38%;
+        --bg-video-opacity: .34;
+    }
+
+    .container {
+        width: 92%;
+    }
+
+    .bg-video-layer::after {
+        opacity: .05;
+        background-size: 30px 30px, 30px 30px;
+        background-position: 0 0, 0 0;
+    }
+
+    .bg-video {
+        filter: saturate(1.08) contrast(1.02) brightness(.9);
+        object-position: center var(--bg-video-y);
+    }
+
+    .theme-solutions .bg-video {
+        opacity: .62;
+        filter: saturate(1.04) contrast(1.03) brightness(1.02);
+    }
+
+    section {
+        margin: 18px 0;
+    }
+
+    .section-intro {
+        padding: 18px;
+        margin-bottom: 10px;
+    }
+
+    .site-title {
+        font-size: 1.25rem;
+    }
+
+    .institute-quick-link {
+        min-width: 100%;
+    }
+
+    .institute-feature-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .institute-gallery-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .student-photo-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .section-intro h2 {
+        font-size: clamp(1.4rem, 1.12rem + 1.5vw, 1.8rem);
+    }
+
+    .section-intro p,
+    .card p,
+    .solutions-hero p {
+        font-size: .93rem;
+        line-height: 1.72;
+    }
+
+    .cards,
+    .solutions-feature-grid,
+    .solutions-detail-grid,
+    .solutions-included-grid {
+        gap: 10px;
+        margin-top: 6px;
+    }
+
+    .card {
+        padding: 14px;
+    }
+
+    .solutions-hero {
+        padding: 22px;
+    }
+
+    .solutions-hero h2,
+    .feature-banner h2 {
+        line-height: 1.18;
+    }
+
+    .solutions-detail-page {
+        gap: 10px;
+    }
+
+    .institute-test-setup {
+        margin-bottom: 8px;
+        gap: 8px;
+    }
+
+    .institute-mock-links {
+        gap: 6px;
+    }
+
+    .card h3 {
+        font-size: 1rem;
+    }
+
+    .auth-btn,
+    .auth-submit {
+        width: 100%;
+        text-align: center;
+    }
+
+    .header-right {
+        align-items: stretch;
+    }
+
+    .auth-btn {
+        min-height: 44px;
+    }
+
+    body.theme-services {
+        --bg-video-y: 36%;
+        --bg-video-scale: 1.03;
+    }
+
+    body.theme-technologies {
+        --bg-video-y: 28%;
+        --bg-video-scale: 1.07;
+    }
+
+    body.theme-institute {
+        --bg-video-y: 24%;
+        --bg-video-scale: 1.08;
+    }
+
+    body.theme-solutions {
+        --bg-video-y: 38%;
+        --bg-video-scale: 1.01;
+    }
+
+}
+
+@media (max-width: 992px) and (orientation: landscape) {
+
+    :root {
+        --bg-video-scale: 1.02;
+        --bg-video-y: 50%;
+        --bg-video-opacity: .5;
+    }
+
+    body.theme-services,
+    body.theme-technologies,
+    body.theme-institute,
+    body.theme-solutions {
+        --bg-video-y: 50%;
+        --bg-video-scale: 1.01;
+    }
+
+}
+
+@media (max-width: 768px) and (orientation: portrait) {
+
+    :root {
+        --bg-video-scale: 1.05;
+        --bg-video-y: 28%;
+    }
+
+    body.theme-services {
+        --bg-video-y: 34%;
+    }
+
+    body.theme-technologies,
+    body.theme-institute {
+        --bg-video-y: 22%;
+    }
+
+    body.theme-solutions {
+        --bg-video-y: 36%;
+    }
+
+}
+
+@media (max-width:768px){
+
+    .solutions-grid{
+        grid-template-columns:1fr;
+        gap:16px;
+    }
+
+    .card-service{
+        min-height:auto;
+    }
+
+     .solutions-highlights{
+        grid-template-columns:1fr;
+    }
+
+    .booking-actions{
+        flex-direction:column;
+        gap:10px;
+    }
+
+    .booking-actions .card-link{
+        width:100%;
+        text-align:center;
+    }
+
+    .solutions-highlight-card{
+        padding:20px;
+    }
+
+    .solutions-cta{
+        padding:22px;
+    }
+}
+/* =================================
+   UNIVERSAL RESPONSIVE GRIDS
+================================= */
+
+.cards,
+.solutions-grid,
+.solutions-highlights,
+.solutions-feature-grid,
+.solutions-detail-grid,
+.solutions-included-grid{
+    display:grid;
+    gap:24px;
+}
+
+/* =========================
+   DESKTOP
+========================= */
+
+.cards{
+    grid-template-columns:repeat(3,1fr);
+}
+
+.solutions-grid{
+    grid-template-columns:repeat(3,1fr);
+}
+
+.solutions-highlights{
+    grid-template-columns:repeat(2,1fr);
+}
+
+/* =========================
+   TABLET
+========================= */
+
+@media (max-width:992px){
+
+    .cards{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .solutions-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .solutions-highlights{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width:768px){
+
+    .cards,
+    .solutions-grid,
+    .solutions-highlights,
+    .solutions-feature-grid,
+    .solutions-detail-grid,
+    .solutions-included-grid{
+        grid-template-columns:1fr;
+        gap:16px;
+    }
+
+    .institute-grid {
+        grid-template-columns: 1fr;
+        justify-content: stretch;
+    }
+
+    .founder-row{
+        grid-template-columns:1fr;
+        text-align:center;
+    }
+
+    .founder-avatar{
+        margin:auto;
+    }
+
+    .institute-feature-grid{
+        grid-template-columns:1fr;
+    }
+
+    .institute-feature-card{
+        grid-column:span 1;
+    }
+
+    .solutions-cta,
+    .solutions-hero,
+    .auth-panel{
+        padding:20px;
+    }
+
+    .exam-question-panel {
+        min-height: 0;
+    }
+
+    .exam-mobile-toggle {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .students-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .exam-number-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .auth-btn,
+    .auth-submit,
+    .card-link,
+    .exam-btn{
+        width:100%;
+        text-align:center;
+    }
+
+}
+
+/* =========================
+   SMALL MOBILE
+========================= */
+
+@media (max-width:480px){
+
+    .container{
+        width:95%;
+    }
+
+    .site-title{
+        font-size:1.1rem;
+    }
+
+    .card{
+        padding:14px;
+    }
+
+    .solutions-hero{
+        padding:18px;
+    }
+
+    .card-logo{
+        width:80%;
+    }
+
+    .students-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .exam-number-grid {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+
+}
+
+/* =========================
+   OVERFLOW FIX
+========================= */
+
+*{
+    max-width:100%;
+}
+
+.solutions-highlight-card,
+.card,
+.card-service,
+.institute-info-card{
+    min-width:0;
+    width:100%;
+}
+
+iframe,
+video,
+img{
+    max-width:100%;
+    height:auto;
+}

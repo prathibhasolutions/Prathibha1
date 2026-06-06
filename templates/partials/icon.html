@@ -1,0 +1,6 @@
+{% load static %}
+<span class="{{ wrapper_class|default:'card-badge' }}" aria-hidden="true">
+    <svg class="icon-symbol" viewBox="0 0 24 24" focusable="false">
+        <use href="{% static 'images/prathibha-icons.svg' %}#{{ icon_id|default:'website-development' }}"></use>
+    </svg>
+</span>

@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ exam.title }} | Prathibha Institute{% endblock %}
+
+{% block content %}
+<section class="exam-page">
+    <div class="exam-header">
+        <h1>{{ exam.title }}</h1>
+        <p>{{ exam.description }}</p>
+    </div>
+
+    <div class="exam-grid">
+        {% for section in sections %}
+        <div class="exam-card">
+            <h3>{{ section.title }}</h3>
+            <p>{{ section.description|default:'Admin can add notes and mocks for this section.' }}</p>
+            <a href="{% url 'institute:exam_section_detail' section.id %}" class="exam-btn">Open Section</a>
+        </div>
+        {% empty %}
+        <div class="exam-card">
+            <h3>No sections added yet</h3>
+            <p>Admin can add sections like Programming Languages, Full Test, Subject-wise Tests, or General Test from Django admin.</p>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

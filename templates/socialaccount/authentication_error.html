@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% load i18n allauth %}
+
+{% block title %}{% trans "Third-Party Login Failure" %}{% endblock %}
+
+{% block content %}
+<section class="auth-panel auth-panel-social">
+    <h2>{% trans "Third-Party Login Failure" %}</h2>
+    <p>{% trans "An error occurred while attempting to login via your third-party account." %}</p>
+    <p><a class="card-link" href="{% url 'login' %}">Back to login</a></p>
+</section>
+{% endblock %}

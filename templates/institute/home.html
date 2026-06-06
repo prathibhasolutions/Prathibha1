@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+
+{% block title %}Prathibha Institute{% endblock %}
+
+{% block content %}
+<section class="section-intro" id="about">
+    <h2>Prathibha Institute</h2>
+    <p>Structured learning tracks with clearly separated sections, real-world course flow, mock tests, and downloadable notes.</p>
+</section>
+
+<section class="institute-catalog" id="courses">
+    <div class="institute-catalog-head">
+        <h3>Courses</h3>
+        <p>Programming and Frontend are shown first. Click View More to reveal all course cards on this page.</p>
+    </div>
+    {% for section in course_sections %}
+    {% if section.key == 'programming-languages' or section.key == 'frontend-development' %}
+    <div class="institute-catalog-section">
+    {% else %}
+    <div class="institute-catalog-section institute-extra-course-section" hidden>
+    {% endif %}
+        <div class="institute-catalog-head">
+            <h3>{{ section.title }}</h3>
+            <p>{{ section.description }}</p>
+        </div>
+
+        <div class="cards institute-grid">
+            {% for course in section.courses %}
+            {% if course.detail_available %}
+            <a class="card card-service" href="{% url 'institute:course_detail' course.slug %}">
+                <div class="card-heading-row">{% include 'partials/icon.html' with icon_id=course.icon_sprite %}<h3>{{ course.title }}</h3></div>
+                <p>{{ course.summary }}</p>
+                <span class="card-link">View Course</span>
+            </a>
+            {% else %}
+            <article class="card card-service">
+                <div class="card-heading-row">{% include 'partials/icon.html' with icon_id=course.icon_sprite %}<h3>{{ course.title }}</h3></div>
+                <p>{{ course.summary }}</p>
+                <span class="card-link">Course details coming soon</span>
+            </article>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+    {% if course_sections|length > 2 %}
+    <div class="institute-view-more-wrap">
+        <button type="button" class="auth-btn" id="view-more-courses-btn" aria-expanded="false">View More Courses</button>
+    </div>
+    {% endif %}
+</section>
+
+<section class="institute-features" aria-label="Key Features">
+    <div class="institute-catalog-head">
+        <h3>Key Features</h3>
+    </div>
+    <div class="institute-feature-grid">
+        <article class="institute-feature-card"><h4>Real Time Trainers</h4></article>
+        <article class="institute-feature-card"><h4>Online/Offline Training</h4></article>
+        <article class="institute-feature-card"><h4>Personalized Attention</h4></article>
+        <article class="institute-feature-card"><h4>Live Projects</h4></article>
+        <article class="institute-feature-card"><h4>Certifications</h4></article>
+    </div>
+</section>
+
+<section class="institute-reviews" aria-label="Student Reviews">
+    <div class="institute-catalog-head">
+        <h3>Student Reviews</h3>
+        <p>Real feedback from our students and achievers.</p>
+    </div>
+    {% if student_reviews %}
+    <div class="institute-review-scroller" id="student-review-scroller">
+        <div class="institute-review-track">
+            {% for item in student_reviews %}
+            <article class="institute-review-card">
+                <div class="institute-review-top">
+                    {% if item.image %}
+                    <img src="{{ item.image.url }}" alt="{{ item.student_name }}" class="institute-review-avatar">
+                    {% elif item.image_url %}
+                    <img src="{{ item.image_url }}" alt="{{ item.student_name }}" class="institute-review-avatar">
+                    {% endif %}
+                    <div class="institute-review-meta">
+                        <h4>{{ item.student_name }}</h4>
+                        {% if item.course_name %}<p>{{ item.course_name }}</p>{% endif %}
+                        {% if item.rank_label %}<p><strong>Rank:</strong> {{ item.rank_label }}</p>{% endif %}
+                        {% if item.education %}<p>{{ item.education }}</p>{% endif %}
+                        {% if item.company_name %}<p>{{ item.company_name }}</p>{% endif %}
+                    </div>
+                </div>
+                {% if item.review %}
+                <p class="institute-review-text">{{ item.review }}</p>
+                {% endif %}
+            </article>
+            {% endfor %}
+            {% for item in student_reviews %}
+            <article class="institute-review-card" aria-hidden="true">
+                <div class="institute-review-top">
+                    {% if item.image %}
+                    <img src="{{ item.image.url }}" alt="" class="institute-review-avatar">
+                    {% elif item.image_url %}
+                    <img src="{{ item.image_url }}" alt="" class="institute-review-avatar">
+                    {% endif %}
+                    <div class="institute-review-meta">
+                        <h4>{{ item.student_name }}</h4>
+                        {% if item.course_name %}<p>{{ item.course_name }}</p>{% endif %}
+                        {% if item.rank_label %}<p><strong>Rank:</strong> {{ item.rank_label }}</p>{% endif %}
+                        {% if item.education %}<p>{{ item.education }}</p>{% endif %}
+                        {% if item.company_name %}<p>{{ item.company_name }}</p>{% endif %}
+                    </div>
+                </div>
+                {% if item.review %}
+                <p class="institute-review-text">{{ item.review }}</p>
+                {% endif %}
+            </article>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <p class="warning-note">Student reviews will appear here once added from admin.</p>
+    {% endif %}
+</section>
+
+<section id="certification" class="institute-cert-section">
+    <div class="institute-cert-copy">
+        <h3>Certification</h3>
+        <p>Our certifications are respected in the software industry and open career opportunities. They validate your skills, prepare you for the workforce, and showcase your expertise to employers, helping you advance professionally.</p>
+    </div>
+    <div class="institute-cert-image-wrap">
+        <img src="https://www.prathibhainstitutions.com/images/0.%20CERTIFICATE.jpg" alt="Prathibha Institute certification sample" class="institute-cert-image">
+    </div>
+</section>
+
+
+<section class="institute-why-choose">
+    <h3>Why Choose Us ?</h3>
+    <p>We are committed to providing high-quality education that sets our students apart in the industry. Our programs are designed to equip you with the knowledge and skills to succeed in your chosen field. We foster innovation, critical thinking, and practical expertise through hands-on learning, mentorship, and continuous support. At Prathibha Institute, we believe in empowering every student to reach their full potential and become leaders in their respective domains.</p>
+</section>
+
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function () {
+    const viewMoreBtn = document.getElementById('view-more-courses-btn');
+    const hiddenSections = Array.from(document.querySelectorAll('.institute-extra-course-section'));
+    if (!viewMoreBtn || !hiddenSections.length) {
+        return;
+    }
+
+    let expanded = false;
+
+    viewMoreBtn.addEventListener('click', function () {
+        expanded = !expanded;
+        hiddenSections.forEach(function (section) {
+            section.hidden = !expanded;
+        });
+        viewMoreBtn.textContent = expanded ? 'View Less Courses' : 'View More Courses';
+        viewMoreBtn.setAttribute('aria-expanded', String(expanded));
+    });
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,145 @@
+/* Premium admin visual layer for Unfold */
+
+:root {
+    --prathibha-primary: #0ea5e9;
+    --prathibha-secondary: #3b82f6;
+    --prathibha-accent: #f97316;
+}
+
+body {
+    background: radial-gradient(1200px 500px at 6% -10%, rgba(14, 165, 233, .16), transparent 60%),
+                radial-gradient(900px 420px at 100% 0%, rgba(59, 130, 246, .14), transparent 58%),
+                linear-gradient(140deg, #070c17 0%, #0f1b33 45%, #142445 100%);
+}
+
+/* Header polish */
+header,
+[data-headlessui-state],
+nav[aria-label='Sidebar'] {
+    backdrop-filter: blur(10px);
+}
+
+/* Card and module surfaces */
+.bg-white,
+[class*='rounded'] {
+    border-radius: 16px !important;
+}
+
+.shadow,
+.shadow-sm,
+.shadow-md,
+.shadow-lg {
+    box-shadow: 0 14px 30px rgba(2, 12, 27, .28) !important;
+}
+
+/* Top actions and primary buttons */
+a.bg-primary-600,
+button.bg-primary-600,
+input[type='submit'],
+.submit-row input,
+.submit-row a.button,
+.button.default {
+    background: linear-gradient(135deg, var(--prathibha-primary), var(--prathibha-secondary)) !important;
+    border: none !important;
+    color: #f8fcff !important;
+    border-radius: 999px !important;
+    font-weight: 700 !important;
+}
+
+a.bg-primary-600:hover,
+button.bg-primary-600:hover,
+input[type='submit']:hover,
+.submit-row input:hover,
+.submit-row a.button:hover,
+.button.default:hover {
+    filter: brightness(1.07);
+    transform: translateY(-1px);
+}
+
+/* Secondary and danger actions */
+.submit-row a.deletelink,
+button.deletelink,
+a.text-red-600 {
+    background: linear-gradient(135deg, #ef4444, #f97316) !important;
+    color: #fff !important;
+    border-radius: 999px !important;
+}
+
+/* Table row polish */
+table tbody tr:hover {
+    background: rgba(14, 165, 233, .06) !important;
+}
+
+/* Sidebar active state emphasis */
+nav a[aria-current='page'],
+nav a.bg-primary-50 {
+    background: linear-gradient(135deg, rgba(14, 165, 233, .18), rgba(59, 130, 246, .14)) !important;
+    border: 1px solid rgba(125, 211, 252, .3) !important;
+    border-radius: 12px !important;
+}
+
+/* Form field readability */
+input,
+select,
+textarea {
+    border-radius: 12px !important;
+}
+
+/* Login page */
+body.login {
+    background: radial-gradient(800px 380px at 4% -10%, rgba(14, 165, 233, .20), transparent 60%),
+                radial-gradient(740px 320px at 100% 0%, rgba(59, 130, 246, .15), transparent 58%),
+                linear-gradient(135deg, #070c17 0%, #0f1b33 42%, #15284a 100%) !important;
+}
+
+.admin-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.admin-kpi-card {
+    display: block;
+    text-decoration: none;
+    border-radius: 16px;
+    padding: 14px;
+    border: 1px solid rgba(148, 163, 184, .24);
+    background: linear-gradient(165deg, rgba(12, 28, 52, .78), rgba(16, 32, 58, .64));
+    box-shadow: 0 12px 22px rgba(2, 8, 23, .3);
+}
+
+.admin-kpi-card:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.04);
+}
+
+.admin-kpi-title {
+    margin: 0 0 6px;
+    color: #cae6ff;
+    font-size: .8rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+}
+
+.admin-kpi-value {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #f4fbff;
+    line-height: 1.2;
+}
+
+.admin-kpi-subtitle {
+    margin: 6px 0 0;
+    color: #b8d4ef;
+    font-size: .85rem;
+}
+
+.admin-kpi-sky { border-color: rgba(125, 211, 252, .34); }
+.admin-kpi-cyan { border-color: rgba(103, 232, 249, .34); }
+.admin-kpi-blue { border-color: rgba(147, 197, 253, .34); }
+.admin-kpi-violet { border-color: rgba(196, 181, 253, .34); }
+.admin-kpi-emerald { border-color: rgba(110, 231, 183, .34); }
+.admin-kpi-amber { border-color: rgba(252, 211, 77, .34); }
+.admin-kpi-rose { border-color: rgba(251, 113, 133, .34); }

@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ course.title }} Test | Prathibha Institute{% endblock %}
+
+{% block content %}
+<section class="section-intro">
+    <h2>{{ course.title }} - Mock Test {{ mock_number }}</h2>
+    <p>Answer all questions and submit to view marks with explanation for wrong answers.</p>
+    <p class="institute-timer-wrap">Time Left: <strong id="institute-timer">--:--</strong></p>
+</section>
+
+<form method="post" class="auth-panel booking-panel institute-test-form" id="institute-test-form" data-timer-seconds="{{ timer_seconds|default:0 }}">
+    {% csrf_token %}
+    <input type="hidden" name="mock_number" value="{{ mock_number }}">
+    <input type="hidden" name="difficulty" value="{{ difficulty }}">
+    <input type="hidden" name="topic" value="{{ topic_slug }}">
+    {% for question in mock_questions %}
+    <article class="solutions-detail-card institute-question-card">
+        <h3>Q{{ forloop.counter }}. {{ question.question }}</h3>
+        <div class="institute-options">
+            {% for option in question.options %}
+            <label class="institute-option">
+                <input type="radio" name="q{{ forloop.parentloop.counter0 }}" value="{{ forloop.counter0 }}">
+                <span>{{ option }}</span>
+            </label>
+            {% endfor %}
+        </div>
+    </article>
+    {% endfor %}
+
+    <button type="submit" class="auth-submit">Submit Test</button>
+</form>
+
+<script>
+    (function () {
+        const form = document.getElementById('institute-test-form');
+        const timerEl = document.getElementById('institute-timer');
+        let remaining = Number(form ? form.dataset.timerSeconds : 0);
+
+        function renderTime() {
+            const mins = Math.floor(remaining / 60);
+            const secs = remaining % 60;
+            timerEl.textContent = String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
+        }
+
+        renderTime();
+        const intervalId = setInterval(function () {
+            remaining -= 1;
+            renderTime();
+
+            if (remaining <= 0) {
+                clearInterval(intervalId);
+                form.submit();
+            }
+        }, 1000);
+    })();
+</script>
+{% endblock %}

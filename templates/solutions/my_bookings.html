@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}My Solution Bookings{% endblock %}
+
+{% block content %}
+<section class="section-intro">
+    <h2>My Solution Bookings</h2>
+    <p>View your solution requests, preferred budget, and project status.</p>
+</section>
+
+{% if bookings %}
+<div class="cards solutions-grid">
+    {% for booking in bookings %}
+    <article class="card card-service">
+        <h3>{{ booking.service_name }}</h3>
+        <p><strong>Status:</strong> <span class="status-pill status-{{ booking.status }}">{{ booking.get_status_display }}</span></p>
+        <p><strong>Budget:</strong> {{ booking.get_budget_range_display }}</p>
+        <p><strong>Delivery Type:</strong> {{ booking.get_preferred_platform_display }}</p>
+        <p><strong>Location:</strong> {{ booking.address_line }}</p>
+        <p><strong>Schedule:</strong> {{ booking.preferred_date }} at {{ booking.preferred_time }}</p>
+        <p><strong>Booked On:</strong> {{ booking.created_at|date:"d M Y, h:i A" }}</p>
+
+        <div class="booking-actions">
+            {% if booking.status != 'cancelled' and booking.status != 'completed' %}
+            <a class="card-link" href="{% url 'solutions:reschedule_booking' booking.id %}">Reschedule</a>
+            <form method="post" action="{% url 'solutions:cancel_booking' booking.id %}" class="inline-form">
+                {% csrf_token %}
+                <button type="submit" class="link-button danger-link">Cancel Booking</button>
+            </form>
+            {% endif %}
+        </div>
+    </article>
+    {% endfor %}
+</div>
+{% else %}
+<p class="section-contact">You have no solution bookings yet. <a href="{% url 'solutions:home' %}">Book now</a>.</p>
+{% endif %}
+{% endblock %}

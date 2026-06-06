@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Prathibha{% endblock %}
+
+{% block content %}
+<section class="section-intro">
+    <h2>Welcome to Prathibha</h2>
+    <p>Choose a division to explore services, training, and digital growth support.</p>
+</section>
+
+<div class="cards home-grid">
+    <a class="card card-feature" href="{% url 'services:home' %}">
+        <img class="card-logo" src="{% static 'images/services-card.png' %}" alt="Prathibha Services logo">
+        <h3>Prathibha Services</h3>
+    </a>
+
+    <a class="card card-feature" href="{% url 'technologies:home' %}">
+        <img class="card-logo" src="{% static 'images/technologies-card.png' %}" alt="Prathibha Technologies logo">
+        <h3>Prathibha Technologies</h3>
+    </a>
+
+    <a class="card card-feature" href="{% url 'institute:home' %}">
+        <img class="card-logo" src="{% static 'images/institute-card.png' %}" alt="Prathibha Institute logo">
+        <h3>Prathibha Institute</h3>
+    </a>
+
+    <a class="card card-feature" href="{% url 'solutions:home' %}">
+        <img class="card-logo" src="{% static 'images/solutions-card.png' %}" alt="Prathibha Solutions logo">
+        <h3>Prathibha Solutions</h3>
+    </a>
+</div>
+{% endblock %}

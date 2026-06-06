@@ -1,0 +1,291 @@
+{% extends 'base.html' %}
+
+{% block title %}Track Technician{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<style>
+    #track-map {
+        height: 360px;
+        width: 100%;
+        margin-top: 18px;
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, .12);
+        overflow: hidden;
+    }
+
+    #track-map-embed {
+        width: 100%;
+        height: 360px;
+        margin-top: 14px;
+        border: 1px solid rgba(255, 255, 255, .12);
+        border-radius: 18px;
+        display: none;
+    }
+
+    #track-map-note {
+        margin-top: 10px;
+        color: #c7d2e8;
+        font-size: .92rem;
+    }
+
+    .vehicle-marker {
+        width: 30px;
+        height: 30px;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        background: rgba(6, 182, 212, .18);
+        border: 1px solid rgba(6, 182, 212, .55);
+        box-shadow: 0 8px 24px rgba(6, 182, 212, .28);
+        backdrop-filter: blur(6px);
+    }
+
+    .vehicle-marker__icon {
+        font-size: 18px;
+        line-height: 1;
+        transform-origin: center;
+        transition: transform .55s ease;
+        filter: drop-shadow(0 3px 6px rgba(0, 0, 0, .28));
+    }
+
+    @media (max-width: 768px) {
+        #track-map {
+            height: 300px;
+        }
+
+        #track-map-embed {
+            height: 300px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="section-intro">
+    <h2>Track Technician</h2>
+    <p>Live status and movement updates for your service booking.</p>
+</section>
+
+<section class="auth-panel booking-panel" data-booking-id="{{ booking.id }}" id="tracking-panel">
+    <h3>{{ booking.service_name }}</h3>
+    <p><strong>Booking ID:</strong> #{{ booking.id }}</p>
+    <p><strong>Status:</strong> <span id="track-status">{{ tracking.status_display }}</span></p>
+    <p><strong>Technician:</strong> <span id="track-technician">{{ tracking.technician_name }}</span></p>
+    <p><strong>Distance:</strong> <span id="track-distance">{% if tracking.distance_km %}{{ tracking.distance_km }} km{% else %}Waiting for technician location{% endif %}</span></p>
+    <p><strong>Estimated Arrival:</strong> <span id="track-eta">{% if tracking.eta_minutes %}{{ tracking.eta_minutes }} minutes{% else %}ETA unavailable{% endif %}</span></p>
+    <p><strong>Last Update:</strong> <span id="track-updated">{{ tracking.technician_location_updated_at|default:'Waiting for first live location update' }}</span></p>
+
+    <div class="booking-actions">
+        <a class="auth-btn" href="{% url 'services:my_bookings' %}">Back to My Bookings</a>
+        <a class="auth-btn auth-btn-google" id="track-map-link" href="{{ tracking.technician_map_url|default:'#' }}" target="_blank" rel="noopener">Open Technician Location</a>
+    </div>
+
+    <div id="track-map" role="img" aria-label="Live technician tracking map"></div>
+    <iframe id="track-map-embed" title="Technician location map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    <p id="track-map-note">Waiting for live coordinates...</p>
+    {{ tracking|json_script:"tracking-data" }}
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+(function () {
+    const panel = document.getElementById('tracking-panel');
+    if (!panel) {
+        return;
+    }
+
+    const bookingId = panel.dataset.bookingId;
+    const statusEl = document.getElementById('track-status');
+    const techEl = document.getElementById('track-technician');
+    const distanceEl = document.getElementById('track-distance');
+    const etaEl = document.getElementById('track-eta');
+    const updatedEl = document.getElementById('track-updated');
+    const mapLinkEl = document.getElementById('track-map-link');
+    const mapEmbedEl = document.getElementById('track-map-embed');
+    const mapNoteEl = document.getElementById('track-map-note');
+    const initialTrackingNode = document.getElementById('tracking-data');
+    const initialTracking = initialTrackingNode ? JSON.parse(initialTrackingNode.textContent) : {};
+
+    const hasLeaflet = typeof window.L !== 'undefined';
+    const map = hasLeaflet
+        ? L.map('track-map', {zoomControl: true}).setView([20.5937, 78.9629], 5)
+        : null;
+
+    if (hasLeaflet) {
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+    } else {
+        document.getElementById('track-map').style.display = 'none';
+    }
+
+    let customerMarker = null;
+    let technicianMarker = null;
+    let routeLine = null;
+    let lastTechnicianPoint = null;
+
+    function createVehicleMarker(latLng, rotation) {
+        const marker = L.marker(latLng, {
+            icon: L.divIcon({
+                className: 'vehicle-marker-wrap',
+                html: `<div class="vehicle-marker"><span class="vehicle-marker__icon" style="transform: rotate(${rotation}deg)">🚚</span></div>`,
+                iconSize: [30, 30],
+                iconAnchor: [15, 15],
+            }),
+        });
+        marker._vehicleRotation = rotation;
+        return marker;
+    }
+
+    function updateVehicleMarker(marker, latLng, rotation) {
+        marker.setLatLng(latLng);
+        const iconNode = marker.getElement()?.querySelector('.vehicle-marker__icon');
+        if (iconNode) {
+            iconNode.style.transform = `rotate(${rotation}deg)`;
+        }
+        marker._vehicleRotation = rotation;
+    }
+
+    function getHeadingDegrees(fromPoint, toPoint) {
+        if (!fromPoint || !toPoint) {
+            return 0;
+        }
+
+        const deltaLat = toPoint[0] - fromPoint[0];
+        const deltaLng = toPoint[1] - fromPoint[1];
+        if (Math.abs(deltaLat) < 0.000001 && Math.abs(deltaLng) < 0.000001) {
+            return 0;
+        }
+
+        const angle = Math.atan2(deltaLng, deltaLat) * (180 / Math.PI);
+        return angle;
+    }
+
+    function updateMap(data) {
+        if (!hasLeaflet) {
+            return;
+        }
+
+        const hasCustomer = data.customer_latitude !== null && data.customer_longitude !== null;
+        const hasTechnician = data.technician_latitude !== null && data.technician_longitude !== null;
+
+        if (hasCustomer) {
+            const customerLatLng = [data.customer_latitude, data.customer_longitude];
+            if (!customerMarker) {
+                customerMarker = L.marker(customerLatLng).addTo(map).bindPopup('Customer Location');
+            } else {
+                customerMarker.setLatLng(customerLatLng);
+            }
+        }
+
+        if (hasTechnician) {
+            const technicianLatLng = [data.technician_latitude, data.technician_longitude];
+            const rotation = getHeadingDegrees(lastTechnicianPoint, technicianLatLng);
+            if (!technicianMarker) {
+                technicianMarker = createVehicleMarker(technicianLatLng, rotation).addTo(map).bindPopup('Technician Live Location');
+            } else {
+                updateVehicleMarker(technicianMarker, technicianLatLng, rotation);
+            }
+            lastTechnicianPoint = technicianLatLng;
+        }
+
+        if (routeLine) {
+            map.removeLayer(routeLine);
+            routeLine = null;
+        }
+
+        const points = [];
+        if (hasCustomer) {
+            points.push([data.customer_latitude, data.customer_longitude]);
+        }
+        if (hasTechnician) {
+            points.push([data.technician_latitude, data.technician_longitude]);
+        }
+
+        if (points.length === 2) {
+            routeLine = L.polyline(points, {
+                color: '#06b6d4',
+                weight: 4,
+                opacity: .85,
+            }).addTo(map);
+            map.fitBounds(routeLine.getBounds(), {padding: [40, 40]});
+        } else if (points.length === 1) {
+            map.setView(points[0], 14);
+        }
+    }
+
+    function updateEmbedMap(data) {
+        const lat = data.technician_latitude ?? data.customer_latitude;
+        const lon = data.technician_longitude ?? data.customer_longitude;
+
+        if (lat === null || lat === undefined || lon === null || lon === undefined) {
+            mapEmbedEl.style.display = 'none';
+            mapNoteEl.textContent = 'Waiting for live coordinates...';
+            return;
+        }
+
+        mapEmbedEl.src = `https://maps.google.com/maps?q=${lat},${lon}&z=15&output=embed`;
+        mapEmbedEl.style.display = 'block';
+
+        if (data.technician_latitude !== null && data.technician_longitude !== null) {
+            mapNoteEl.textContent = `Technician live location: ${Number(data.technician_latitude).toFixed(6)}, ${Number(data.technician_longitude).toFixed(6)}`;
+        } else {
+            mapNoteEl.textContent = 'Technician live location not shared yet. Showing customer destination.';
+        }
+    }
+
+    function applyTrackingData(data) {
+        statusEl.textContent = data.status_display || 'Pending';
+        techEl.textContent = data.technician_name || 'Not assigned yet';
+
+        if (data.distance_km === null || data.distance_km === undefined) {
+            distanceEl.textContent = 'Waiting for technician location';
+        } else {
+            distanceEl.textContent = data.distance_km + ' km';
+        }
+
+        if (data.eta_minutes === null || data.eta_minutes === undefined) {
+            etaEl.textContent = 'ETA unavailable';
+        } else {
+            etaEl.textContent = data.eta_minutes + ' minutes';
+        }
+
+        updatedEl.textContent = data.technician_location_updated_at || 'Waiting for first live location update';
+
+        if (data.technician_map_url) {
+            mapLinkEl.href = data.technician_map_url;
+            mapLinkEl.style.opacity = '1';
+            mapLinkEl.style.pointerEvents = 'auto';
+        } else {
+            mapLinkEl.href = '#';
+            mapLinkEl.style.opacity = '.6';
+            mapLinkEl.style.pointerEvents = 'none';
+        }
+
+        updateMap(data);
+        updateEmbedMap(data);
+    }
+
+    async function refreshTracking() {
+        try {
+            const response = await fetch(`/services/track-data/${bookingId}/`, {headers: {'X-Requested-With': 'XMLHttpRequest'}});
+            if (!response.ok) {
+                return;
+            }
+            const data = await response.json();
+            applyTrackingData(data);
+        } catch (err) {
+            console.error('Tracking refresh failed', err);
+        }
+    }
+
+    applyTrackingData(initialTracking);
+    refreshTracking();
+    setInterval(refreshTracking, 8000);
+})();
+</script>
+{% endblock %}

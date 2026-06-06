@@ -1,0 +1,325 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Prathibha Group{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/base.css' %}?v=20260603m2">
+    <link rel="stylesheet" href="{% static 'css/layout.css' %}?v=20260603m2">
+    <link rel="stylesheet" href="{% static 'css/components.css' %}?v=20260603m2">
+    <link rel="stylesheet" href="{% static 'css/pages.css' %}?v=20260603m2">
+    <link rel="stylesheet" href="{% static 'css/responsive.css' %}?v=20260603m2">
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% if request.path == '/' %}theme-home{% elif request.path|slice:':10' == '/services/' %}theme-services{% elif request.path|slice:':14' == '/technologies/' %}theme-technologies{% elif request.path|slice:':11' == '/institute/' %}theme-institute{% elif request.path|slice:':11' == '/solutions/' %}theme-solutions{% else %}theme-home{% endif %}{% endblock %}">
+<div class="bg-video-layer" aria-hidden="true">
+    {% if request.path != '/' %}
+    <video class="bg-video" autoplay muted loop playsinline preload="auto">
+        {% if request.path|slice:':10' == '/services/' %}
+        <source src="{% static 'videos/services-pro-bg.mp4' %}?v=20260531f" type="video/mp4">
+        {% elif request.path|slice:':14' == '/technologies/' %}
+        <source src="{% static 'videos/technologies-bg.mp4' %}?v=20260531c" type="video/mp4">
+        {% elif request.path|slice:':11' == '/institute/' %}
+        <source src="{% static 'videos/institute-bg.mp4' %}?v=20260531b" type="video/mp4">
+        {% elif request.path|slice:':11' == '/solutions/' %}
+        <source src="{% static 'videos/solutions-bg.mp4' %}?v=20260531d" type="video/mp4">
+        {% else %}
+        <source src="{% static 'videos/home-main-bg.mp4' %}?v=20260531a" type="video/mp4">
+        {% endif %}
+    </video>
+    {% endif %}
+</div>
+
+<header class="site-header">
+    <div class="container">
+        <div class="header-left">
+            {% if request.path|slice:':11' == '/institute/' %}
+            <button type="button" class="mobile-nav-toggle" id="mobile-nav-toggle" aria-controls="mobile-nav-drawer" aria-expanded="false" aria-label="Open menu">
+                <span class="mobile-nav-toggle-icon" aria-hidden="true"><i></i><i></i><i></i></span>
+            </button>
+            {% endif %}
+
+            <a href="/" class="site-title-link">
+                <h1 class="site-title">
+                    {% if request.path|slice:':11' == '/institute/' %}
+                        Prathibha Institute
+                    {% else %}
+                        Prathibha
+                    {% endif %}
+                </h1>
+            </a>
+        </div>
+
+        <div class="header-right desktop-header-actions{% if request.path|slice:':11' == '/institute/' %} institute-header-links{% endif %}">
+            {% if request.path|slice:':11' == '/institute/' %}
+            <a class="institute-quick-link" href="{% url 'institute:home' %}">Home</a>
+            <a class="institute-quick-link" href="{% url 'institute:about' %}">About</a>
+            <a class="institute-quick-link" href="{% url 'institute:courses' %}">Courses</a>
+            <a class="institute-quick-link" href="{% url 'institute:exam_home' %}">Exams</a>
+            <a class="institute-quick-link" href="{% url 'institute:contact' %}">Contact</a>
+            <div class="institute-quick-dropdown">
+                <button type="button" class="institute-quick-link institute-quick-link-dropdown">Quick Links</button>
+                <div class="institute-quick-dropdown-menu">
+                    <a class="institute-quick-dropdown-item" href="{% url 'institute:gallery' %}">Gallery</a>
+                    <a class="institute-quick-dropdown-item" href="{% url 'institute:certificates' %}">Certificate Verification</a>
+                    <a class="institute-quick-dropdown-item" href="{% url 'institute:students' %}">Our Students</a>
+                    {% if user.is_authenticated %}
+                    <a class="institute-quick-dropdown-item" href="{% url 'institute:exam_attempt_history' %}">My Attempts</a>
+                    {% endif %}
+                </div>
+            </div>
+            <a class="institute-quick-link institute-quick-link-call" href="tel:9030941099">Call Now</a>
+            {% elif user.is_authenticated %}
+            <span class="auth-user">Hi, {{ user.username }}</span>
+
+            {% if user.is_superuser %}
+                <a class="auth-btn" href="{% url 'admin:index' %}">Admin Dashboard</a>
+            {% endif %}
+
+            <form method="post" action="{% url 'logout' %}" class="logout-form">
+                {% csrf_token %}
+                <button type="submit" class="auth-btn" aria-label="Logout">Logout</button>
+            </form>
+            {% else %}
+            <a class="auth-btn" href="{% url 'login' %}" aria-label="Login">Login</a>
+            <a class="auth-btn" href="{% url 'accounts:register' %}" aria-label="Register">Register</a>
+            {% endif %}
+        </div>
+    </div>
+</header>
+
+<div class="mobile-nav-backdrop" id="mobile-nav-backdrop" hidden></div>
+
+<aside class="mobile-nav-drawer" id="mobile-nav-drawer" aria-hidden="true" hidden>
+    <div class="mobile-nav-head">
+        <button type="button" class="mobile-nav-close" id="mobile-nav-close" aria-label="Close menu">&times;</button>
+    </div>
+    <nav class="mobile-nav-links">
+        <a class="mobile-nav-link" href="{% url 'institute:home' %}">Home</a>
+        <a class="mobile-nav-link" href="{% url 'institute:about' %}">About</a>
+        <a class="mobile-nav-link" href="{% url 'institute:courses' %}">Courses</a>
+        <a class="mobile-nav-link" href="{% url 'institute:exam_home' %}">Exams</a>
+        <a class="mobile-nav-link" href="{% url 'institute:contact' %}">Contact</a>
+        <a class="mobile-nav-link" href="{% url 'institute:home' %}#quick-links">Quick Links</a>
+        <a class="mobile-nav-link" href="tel:9030941099">Call Now</a>
+    </nav>
+</aside>
+
+<div class="mobile-bottom-bar" id="mobile-bottom-bar" aria-label="Mobile quick actions" hidden>
+    <a class="mobile-bottom-btn" href="/" aria-label="Home"><span aria-hidden="true">⌂</span></a>
+    <button type="button" class="mobile-bottom-btn" id="mobile-bottom-mid" aria-label="Coming soon" disabled><span aria-hidden="true">●</span></button>
+    <button type="button" class="mobile-bottom-btn" id="mobile-account-toggle" aria-label="Open account"><span aria-hidden="true">👤</span></button>
+</div>
+
+{% if not user.is_authenticated %}
+<section class="mobile-login-modal" id="mobile-login-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Login" hidden>
+    <div class="mobile-login-head">
+        <h3>Login</h3>
+        <button type="button" class="mobile-nav-close" id="mobile-login-close" aria-label="Close login">&times;</button>
+    </div>
+    <form method="post" action="{% url 'login' %}" class="mobile-login-form">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.path }}">
+        <label for="mobile-login-username">Email / Username</label>
+        <input id="mobile-login-username" name="username" type="text" required autocomplete="username" class="contact-input">
+        <label for="mobile-login-password">Password</label>
+        <input id="mobile-login-password" name="password" type="password" required autocomplete="current-password" class="contact-input">
+        <button type="submit" class="auth-submit">Login</button>
+    </form>
+    <p class="mobile-login-meta">New user? <a href="{% url 'accounts:register' %}">Register</a></p>
+    <p><a class="auth-btn auth-btn-google auth-btn-full" href="{% url 'accounts:google_login' %}">Continue with Google</a></p>
+</section>
+{% endif %}
+
+{% if user.is_authenticated %}
+<section class="mobile-account-sheet" id="mobile-account-sheet" aria-hidden="true" hidden>
+    <div class="mobile-account-head">
+        <button type="button" class="mobile-nav-close" id="mobile-account-close" aria-label="Close account">&times;</button>
+    </div>
+    <div class="mobile-account-body">
+        <div class="mobile-profile-avatar" aria-hidden="true">{{ user.username|slice:":1"|upper }}</div>
+        <p><strong>Name:</strong> {{ user.get_full_name|default:user.username }}</p>
+        <p><strong>Username:</strong> {{ user.username }}</p>
+        {% if user.email %}<p><strong>Email:</strong> {{ user.email }}</p>{% endif %}
+        {% if user.is_superuser %}
+        <p><strong>Role:</strong> Administrator</p>
+        <p><a class="mobile-nav-link" href="{% url 'admin:index' %}">Admin Dashboard</a></p>
+        {% else %}
+        <p><strong>Role:</strong> User</p>
+        {% for group in user.groups.all %}
+        {% if group.name == 'Technician' %}
+        <p><a class="mobile-nav-link" href="{% url 'services:technician_dashboard' %}">Technician Dashboard</a></p>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+        <p><a class="mobile-nav-link" href="{% url 'password_change' %}">Settings</a></p>
+    </div>
+    <form method="post" action="{% url 'logout' %}" class="mobile-account-logout-form">
+        {% csrf_token %}
+        <button type="submit" class="auth-btn">Logout</button>
+    </form>
+</section>
+{% endif %}
+
+<main class="container">
+    {% if messages %}
+    <div class="flash-wrap">
+        {% for message in messages %}
+        <div class="flash-message {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+</main>
+
+{% block extra_scripts %}{% endblock %}
+<script>
+(function () {
+    const isMobile = function () { return window.matchMedia('(max-width: 768px)').matches; };
+    const toggleBtn = document.getElementById('mobile-nav-toggle');
+    const closeBtn = document.getElementById('mobile-nav-close');
+    const drawer = document.getElementById('mobile-nav-drawer');
+    const bottomBar = document.getElementById('mobile-bottom-bar');
+    const navLinks = Array.from(document.querySelectorAll('.mobile-nav-link'));
+    const backdrop = document.getElementById('mobile-nav-backdrop');
+    const loginCloseBtn = document.getElementById('mobile-login-close');
+    const loginModal = document.getElementById('mobile-login-modal');
+    const accountToggle = document.getElementById('mobile-account-toggle');
+    const accountClose = document.getElementById('mobile-account-close');
+    const accountSheet = document.getElementById('mobile-account-sheet');
+
+    function openBackdrop() {
+        if (backdrop) {
+            backdrop.hidden = false;
+        }
+        document.body.classList.add('mobile-nav-open');
+    }
+
+    function closeBackdrop() {
+        if (backdrop) {
+            backdrop.hidden = true;
+        }
+        document.body.classList.remove('mobile-nav-open');
+    }
+
+    function closeDrawer() {
+        if (!drawer) {
+            return;
+        }
+        drawer.classList.remove('is-open');
+        drawer.setAttribute('aria-hidden', 'true');
+        drawer.hidden = true;
+        if (toggleBtn) {
+            toggleBtn.setAttribute('aria-expanded', 'false');
+        }
+    }
+
+    function closeLoginModal() {
+        if (!loginModal) {
+            return;
+        }
+        loginModal.classList.remove('is-open');
+        loginModal.setAttribute('aria-hidden', 'true');
+        loginModal.hidden = true;
+    }
+
+    function closeAccountSheet() {
+        if (!accountSheet) {
+            return;
+        }
+        accountSheet.classList.remove('is-open');
+        accountSheet.setAttribute('aria-hidden', 'true');
+        accountSheet.hidden = true;
+    }
+
+    function closeAll() {
+        closeDrawer();
+        closeLoginModal();
+        closeAccountSheet();
+        closeBackdrop();
+    }
+
+    if (toggleBtn && closeBtn && drawer && backdrop) {
+        toggleBtn.addEventListener('click', function () {
+            if (!isMobile()) {
+                return;
+            }
+            if (drawer.classList.contains('is-open')) {
+                closeAll();
+                return;
+            }
+            closeLoginModal();
+            closeAccountSheet();
+            drawer.hidden = false;
+            drawer.classList.add('is-open');
+            drawer.setAttribute('aria-hidden', 'false');
+            toggleBtn.setAttribute('aria-expanded', 'true');
+            openBackdrop();
+        });
+
+        closeBtn.addEventListener('click', closeAll);
+
+        navLinks.forEach(function (link) {
+            link.addEventListener('click', closeAll);
+        });
+
+        backdrop.addEventListener('click', closeAll);
+    }
+
+    if (loginCloseBtn) {
+        loginCloseBtn.addEventListener('click', closeAll);
+    }
+
+    if (accountToggle && backdrop) {
+        accountToggle.addEventListener('click', function () {
+            if (!isMobile()) {
+                return;
+            }
+            if (accountSheet && accountSheet.classList.contains('is-open')) {
+                closeAll();
+                return;
+            }
+            if (!accountSheet && loginModal && loginModal.classList.contains('is-open')) {
+                closeAll();
+                return;
+            }
+            closeDrawer();
+            if (accountSheet) {
+                closeLoginModal();
+                accountSheet.hidden = false;
+                accountSheet.classList.add('is-open');
+                accountSheet.setAttribute('aria-hidden', 'false');
+            } else if (loginModal) {
+                loginModal.hidden = false;
+                loginModal.classList.add('is-open');
+                loginModal.setAttribute('aria-hidden', 'false');
+            }
+            openBackdrop();
+        });
+    }
+
+    if (bottomBar) {
+        bottomBar.hidden = !isMobile();
+    }
+
+    if (accountClose) {
+        accountClose.addEventListener('click', closeAll);
+    }
+
+    window.addEventListener('resize', function () {
+        if (!isMobile()) {
+            closeAll();
+            if (bottomBar) {
+                bottomBar.hidden = true;
+            }
+            return;
+        }
+        if (bottomBar) {
+            bottomBar.hidden = false;
+        }
+    });
+})();
+</script>
+</body>
+</html>

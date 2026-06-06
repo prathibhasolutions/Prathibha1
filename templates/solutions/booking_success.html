@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}Solution Booking Submitted{% endblock %}
+
+{% block content %}
+<section class="auth-panel booking-panel">
+    <h2>Booking Submitted Successfully</h2>
+    <p>Your request has been sent to the Prathibha Solutions team.</p>
+    {% if booking %}
+    <p><strong>Service:</strong> {{ booking.service_name }}</p>
+    <p><strong>Budget Range:</strong> {{ booking.get_budget_range_display }}</p>
+    <p><strong>Delivery Type:</strong> {{ booking.get_preferred_platform_display }}</p>
+    <p><strong>Status:</strong> {{ booking.get_status_display }}</p>
+    {% endif %}
+    <p>You can track booking status in <a href="{% url 'solutions:my_bookings' %}">My Bookings</a>.</p>
+    <a class="card-link" href="{% url 'solutions:home' %}">Back to Solutions</a>
+</section>
+{% endblock %}

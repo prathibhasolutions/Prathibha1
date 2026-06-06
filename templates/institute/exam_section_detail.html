@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ section.title }} | {{ exam.title }}{% endblock %}
+
+{% block content %}
+<section class="exam-page">
+    <div class="exam-header">
+        <h1>{{ section.title }}</h1>
+        <p>{{ section.description|default:exam.description }}</p>
+    </div>
+
+    <section class="solutions-detail-card institute-result-card">
+        <h3>Notes</h3>
+        {% if notes %}
+        <div class="institute-review-list">
+            {% for note in notes %}
+            <article class="institute-review-item institute-correct">
+                <h4>{{ note.title }}</h4>
+                {% if note.description %}<p>{{ note.description }}</p>{% endif %}
+                {% if note.file %}
+                <p><a class="auth-btn" href="{{ note.file.url }}" target="_blank" rel="noopener">Open Notes</a></p>
+                {% elif note.external_url %}
+                <p><a class="auth-btn" href="{{ note.external_url }}" target="_blank" rel="noopener">Open Notes</a></p>
+                {% else %}
+                <p class="warning-note">Notes link/file will be added by admin.</p>
+                {% endif %}
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="warning-note">No notes added yet. Admin can upload or link notes for this section.</p>
+        {% endif %}
+    </section>
+
+    <section class="solutions-detail-card institute-result-card">
+        <h3>Select Mock Test</h3>
+        {% if mocks %}
+        <div class="exam-grid">
+            {% for mock in mocks %}
+            <div class="exam-card">
+                <h3>{{ mock.title }}</h3>
+                {% if mock.description %}<p>{{ mock.description }}</p>{% endif %}
+                <p><strong>Duration:</strong> {{ mock.duration_minutes }} mins</p>
+                {% if mock.question_count %}<p><strong>Questions:</strong> {{ mock.question_count }}</p>{% endif %}
+                {% if mock.local_question_count %}
+                <a href="{% url 'institute:exam_mock_test' section.id mock.id %}" class="exam-btn">Start Mock (MCQ)</a>
+                {% if mock.test_url %}
+                <p style="margin-top:8px;"><a href="{{ mock.test_url }}" target="_blank" rel="noopener">Open External URL</a></p>
+                {% endif %}
+                {% elif mock.test_url %}
+                <a href="{{ mock.test_url }}" class="exam-btn" target="_blank" rel="noopener">Take Test</a>
+                {% else %}
+                <span class="exam-btn">Test Link Pending</span>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="warning-note">No mock tests added yet. Admin can add Mock 1, Mock 2, full tests, or sub-wise tests for this section.</p>
+        {% endif %}
+        <p class="warning-note">Admin can add MCQ questions directly in Django admin. LaTeX is supported using $...$ (inline) and $$...$$ (block).</p>
+    </section>
+</section>
+{% endblock %}

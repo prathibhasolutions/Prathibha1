@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Prathibha Services{% endblock %}
+
+{% block content %}
+<section class="section-intro">
+    <h2>Prathibha Services</h2>
+    <p>Reliable doorstep support for home and commercial needs. Login and book any service to your location.</p>
+</section>
+
+{% if user.is_authenticated %}
+<p class="section-contact">Welcome {{ user.username }}.</p>
+{% if is_technician_user %}
+<div class="section-contact">
+    <p>Technician mode is active. Open your dashboard from the header to manage assigned orders and live location.</p>
+</div>
+{% else %}
+<div class="section-contact">
+    <p>View what you booked, cancel requests, and track your technician.</p>
+    <div class="booking-actions">
+        <a class="auth-btn" href="{% url 'services:my_bookings' %}">My Bookings</a>
+        <a class="auth-btn auth-btn-google" href="{% url 'services:my_bookings' %}">Cancel Order</a>
+    </div>
+</div>
+{% endif %}
+{% else %}
+<p class="section-contact">Please <a href="{% url 'login' %}">login</a> to book a service instantly.</p>
+{% endif %}
+
+<div class="cards services-grid">
+    <article class="card card-service"><div class="card-heading-row">{% include 'partials/icon.html' with icon_id='electrician' %}<h3>Electrician</h3></div><p>Safe and quick electrical fixing and wiring support.</p><a class="card-link" href="{% url 'services:book' %}?service=Electrician">Book Now</a></article>
+    <article class="card card-service"><div class="card-heading-row">{% include 'partials/icon.html' with icon_id='carpenter' %}<h3>Carpenter</h3></div><p>Furniture fittings, repairs, and woodwork assistance.</p><a class="card-link" href="{% url 'services:book' %}?service=Carpenter">Book Now</a></article>
+    <article class="card card-service"><div class="card-heading-row">{% include 'partials/icon.html' with icon_id='plumber' %}<h3>Plumber</h3></div><p>Leak fixing, pipe setup, and bathroom plumbing works.</p><a class="card-link" href="{% url 'services:book' %}?service=Plumber">Book Now</a></article>
+    <article class="card card-service"><div class="card-heading-row">{% include 'partials/icon.html' with icon_id='geyser' %}<h3>Geyser Repair</h3></div><p>Inspection and repair for electric and gas geysers.</p><a class="card-link" href="{% url 'services:book' %}?service=Geyser+Repair">Book Now</a></article>
+    <article class="card card-service"><div class="card-heading-row">{% include 'partials/icon.html' with icon_id='washing-machine' %}<h3>Washing Machine Repair</h3></div><p>Front load and top load machine diagnostics and service.</p><a class="card-link" href="{% url 'services:book' %}?service=Washing+Machine+Repair">Book Now</a></article>
+    <article class="card card-service"><div class="card-heading-row">{% include 'partials/icon.html' with icon_id='goods-carrier' %}<h3>Goods Carrier</h3></div><p>Local shifting and goods transport for homes and shops.</p><a class="card-link" href="{% url 'services:book' %}?service=Goods+Carrier">Book Now</a></article>
+    <article class="card card-service"><div class="card-heading-row">{% include 'partials/icon.html' with icon_id='water-purifier' %}<h3>Water Purifier</h3></div><p>RO installation, servicing, and filter replacement.</p><a class="card-link" href="{% url 'services:book' %}?service=Water+Purifier">Book Now</a></article>
+    <article class="card card-service"><div class="card-heading-row">{% include 'partials/icon.html' with icon_id='painting' %}<h3>Painting</h3></div><p>Interior and exterior painting with neat finishing.</p><a class="card-link" href="{% url 'services:book' %}?service=Painting">Book Now</a></article>
+    <article class="card card-service"><div class="card-heading-row">{% include 'partials/icon.html' with icon_id='refrigerator' %}<h3>Refrigerator Repair</h3></div><p>Cooling issues, gas refill, and compressor troubleshooting.</p><a class="card-link" href="{% url 'services:book' %}?service=Refrigerator+Repair">Book Now</a></article>
+    <article class="card card-service"><div class="card-heading-row">{% include 'partials/icon.html' with icon_id='tiles' %}<h3>Tiles Work</h3></div><p>Floor and wall tile installation and repair work.</p><a class="card-link" href="{% url 'services:book' %}?service=Tiles+Work">Book Now</a></article>
+</div>
+
+<p class="section-contact">Call or WhatsApp: <strong>93477 49024</strong></p>
+{% endblock %}
